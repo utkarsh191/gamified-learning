@@ -1,19 +1,22 @@
 import { useState } from "react";
+import { registerUser } from "../services/authService";
 
 function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    console.log({
-      name,
-      email,
-      password,
-    });
-  };
+  try {
+    const data = await registerUser(name, email, password);
+
+    console.log("Signup successful:", data);
+  } catch (error) {
+    console.error("Signup failed:", error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
