@@ -1,7 +1,8 @@
 import { Navigate } from "react-router-dom";
+import type { ReactNode } from "react";
 
 interface ProtectedRouteProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 function ProtectedRoute({ children }: ProtectedRouteProps) {
@@ -15,15 +16,3 @@ function ProtectedRoute({ children }: ProtectedRouteProps) {
 }
 
 export default ProtectedRoute;
-
-
-
-
-
-
-
-
-
-
-
-
