@@ -1,16 +1,21 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import { loginUser } from "../services/authService";
 
 function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log({
-      email,
-      password,
-    });
+    try {
+      const data = await loginUser(email, password);
+
+      console.log("Login successful:", data);
+    } catch (error) {
+      console.error("Login failed:", error);
+    }
   };
 
   return (
@@ -65,9 +70,11 @@ function Login() {
 
         <p className="text-gray-400 text-center mt-6">
           Don't have an account?{" "}
-          <span className="text-blue-400 cursor-pointer hover:text-blue-300">
+          <Link
+           to="/signup"
+           className="text-blue-400 cursor-pointer  hover:text-blue-300">
             Sign up
-          </span>
+          </Link>
         </p>
       </div>
     </div>

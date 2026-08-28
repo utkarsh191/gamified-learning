@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { registerUser } from "../services/authService";
+import { Link } from "react-router-dom";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -85,9 +86,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
         <p className="text-gray-400 text-center mt-6">
           Already have an account?{" "}
-          <span className="text-blue-400 cursor-pointer hover:text-blue-300">
+          <Link 
+          to="/login"
+          className="text-blue-400 cursor-pointer hover:text-blue-300">
             Login
-          </span>
+          </Link>
         </p>
       </div>
     </div>
