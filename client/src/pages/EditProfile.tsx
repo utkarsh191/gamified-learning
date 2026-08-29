@@ -125,6 +125,17 @@ function EditProfile() {
           </div>
         </section>
 
+        {/* Experience */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold">
+            Experience
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-400">
+            Share your growth from learning to career.
+          </p>
+        </section>
+
       </div>
     </div>
   );
