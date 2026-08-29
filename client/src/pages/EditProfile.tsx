@@ -8,6 +8,9 @@ const [linkedinUsername, setLinkedinUsername] = useState("");
 const [leetcodeUsername, setLeetcodeUsername] = useState("");
 const [xUsername, setXUsername] = useState("");
 const [readMe, setReadMe] = useState("");
+const [workExperience, setWorkExperience] = useState("");
+const [education, setEducation] = useState("");
+const [skills, setSkills] = useState("");
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
@@ -171,11 +174,13 @@ const [readMe, setReadMe] = useState("");
                 Work
               </label>
 
-              <input
-                type="text"
-                placeholder="Enter your work or experience"
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-              />
+             <textarea
+  rows={6}
+  placeholder="Write about your work experience..."
+  value={workExperience}
+  onChange={(e) => setWorkExperience(e.target.value)}
+  className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+/>
             </div>
 
             {/* Education */}
@@ -187,6 +192,8 @@ const [readMe, setReadMe] = useState("");
               <input
                 type="text"
                 placeholder="Enter your education"
+                value={education}
+                onChange={(e) => setEducation(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -200,6 +207,8 @@ const [readMe, setReadMe] = useState("");
               <input
                 type="text"
                 placeholder="Enter your skills separated by commas"
+                value={skills}
+                onChange={(e) => setSkills(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
