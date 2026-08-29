@@ -1,0 +1,31 @@
+function EditProfile() {
+  return (
+    <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
+      <div className="mx-auto max-w-4xl">
+
+        {/* Profile Photo */}
+        <section className="mb-10">
+          <h2 className="text-xl font-bold">
+            Profile Photo
+          </h2>
+
+          <div className="mt-4 flex items-center gap-5">
+            <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-gray-700 text-3xl font-bold">
+              U
+            </div>
+
+            <button
+              type="button"
+              className="rounded-lg bg-gray-700 px-5 py-2 font-semibold transition hover:bg-gray-600"
+            >
+              Change Photo
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  );
+}
+
+export default EditProfile;
