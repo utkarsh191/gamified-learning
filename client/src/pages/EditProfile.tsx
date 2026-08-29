@@ -15,6 +15,26 @@ const [currentLearning, setCurrentLearning] = useState("");
 const [interests, setInterests] = useState("");
 const [learningGoals, setLearningGoals] = useState("");
 
+const handleSave = () => {
+  const profileData = {
+    displayName,
+    location,
+    githubUsername,
+    linkedinUsername,
+    leetcodeUsername,
+    xUsername,
+    readMe,
+    workExperience,
+    education,
+    skills,
+    currentLearning,
+    interests,
+    learningGoals,
+  };
+
+  console.log(profileData);
+};
+
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
       <div className="mx-auto max-w-4xl">
@@ -270,7 +290,7 @@ const [learningGoals, setLearningGoals] = useState("");
               <textarea
                 rows={4}
                 placeholder="Enter your learning goals"
-                  value={learningGoals}
+                value={learningGoals}
                 onChange={(e) => setLearningGoals(e.target.value)}
                 className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
@@ -352,6 +372,7 @@ const [learningGoals, setLearningGoals] = useState("");
         <div className="mt-10 pb-10">
           <button
             type="button"
+            onClick={handleSave}
             className="rounded-lg bg-blue-600 px-8 py-3 font-semibold transition hover:bg-blue-700"
           >
             Save Changes
