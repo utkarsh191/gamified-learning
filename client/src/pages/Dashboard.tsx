@@ -1,6 +1,6 @@
 function Dashboard() {
   return (
-    <div className="min-h-screen bg-gray-900">
+    <div className="min-h-screen bg-gray-900 flex flex-col">
 
       {/* Navbar */}
       <nav className="w-full bg-gray-800 border-b border-gray-700 px-6 py-4">
@@ -42,6 +42,32 @@ function Dashboard() {
           </div>
         </div>
       </nav>
+
+      {/* Main Content */}
+      <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
+        
+      </main>
+
+      {/* Message Bar */}
+      <div className="w-full border-t border-gray-700 bg-gray-800 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex items-center gap-3">
+
+          {/* Message Input */}
+          <input
+            type="text"
+            placeholder="Write a message..."
+            className="flex-1 bg-gray-700 text-white rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          {/* Send Button */}
+          <button
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-full transition"
+          >
+            Send ➤
+          </button>
+
+        </div>
+      </div>
 
     </div>
   );
