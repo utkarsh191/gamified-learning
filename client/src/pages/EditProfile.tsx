@@ -1,4 +1,9 @@
-function EditProfile() {
+import { useState } from "react";
+
+  function EditProfile() {
+  const [displayName, setDisplayName] = useState("");
+  const [location, setLocation] = useState("");
+
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
       <div className="mx-auto max-w-4xl">
@@ -11,7 +16,7 @@ function EditProfile() {
 
           <div className="mt-4 flex items-center gap-5">
             <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-gray-700 text-3xl font-bold">
-              U
+              👤
             </div>
 
             <button
@@ -38,12 +43,14 @@ function EditProfile() {
             {/* Display Name */}
             <div>
               <label className="mb-2 block font-semibold">
-                Display Name
+                 Name
               </label>
 
               <input
                 type="text"
                 placeholder="Enter your display name"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -57,6 +64,8 @@ function EditProfile() {
               <input
                 type="text"
                 placeholder="Enter your location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
