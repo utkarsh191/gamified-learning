@@ -1,10 +1,10 @@
 import express from "express";
 
-import { protect } from "../middleware/authMiddleware.js";
+import { AuthRequest, protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-router.put("/", protect, (req, res) => {
+router.put("/", protect, (req: AuthRequest, res) => {
   console.log(req.user);
   console.log(req.body);
 
