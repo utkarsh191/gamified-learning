@@ -33,95 +33,99 @@ function EditProfile() {
             Manage your basic profile information.
           </p>
 
-          {/* Display Name */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              Display Name
-            </label>
+          <div className="mt-5 space-y-5">
 
-            <input
-              type="text"
-              placeholder="Enter your display name"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
-          </div>
+            {/* Display Name */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Display Name
+              </label>
 
-          {/* Location */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              Location
-            </label>
+              <input
+                type="text"
+                placeholder="Enter your display name"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
 
-            <input
-              type="text"
-              placeholder="Enter your location"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
-          </div>
+            {/* Location */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Location
+              </label>
 
-          {/* GitHub Username */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              GitHub Username
-            </label>
+              <input
+                type="text"
+                placeholder="Enter your location"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
 
-            <input
-              type="text"
-              placeholder="Enter your GitHub username"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
-          </div>
+            {/* GitHub */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                GitHub Username
+              </label>
 
-          {/* LinkedIn Username */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              LinkedIn Username
-            </label>
+              <input
+                type="text"
+                placeholder="Enter your GitHub username"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
 
-            <input
-              type="text"
-              placeholder="Enter your LinkedIn username"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
-          </div>
+            {/* LinkedIn */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                LinkedIn Username
+              </label>
 
-          {/* LeetCode Username */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              LeetCode Username
-            </label>
+              <input
+                type="text"
+                placeholder="Enter your LinkedIn username"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
 
-            <input
-              type="text"
-              placeholder="Enter your LeetCode username"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
-          </div>
+            {/* LeetCode */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                LeetCode Username
+              </label>
 
-          {/* X Username */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              X Username
-            </label>
+              <input
+                type="text"
+                placeholder="Enter your LeetCode username"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
 
-            <input
-              type="text"
-              placeholder="Enter your X username"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
-          </div>
+            {/* X */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                X Username
+              </label>
 
-          {/* ReadMe */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              ReadMe
-            </label>
+              <input
+                type="text"
+                placeholder="Enter your X username"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
 
-            <textarea
-              rows={5}
-              placeholder="Write something about yourself..."
-              className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
+            {/* ReadMe */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                ReadMe
+              </label>
+
+              <textarea
+                rows={5}
+                placeholder="Write something about yourself..."
+                className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
           </div>
         </section>
 
@@ -135,19 +139,50 @@ function EditProfile() {
             Share your growth from learning to career.
           </p>
 
-          {/* Work */}
-          <div className="mt-5">
-            <label className="mb-2 block font-semibold">
-              Work
-            </label>
+          <div className="mt-5 space-y-5">
 
-            <input
-              type="text"
-              placeholder="Enter your work or experience"
-              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-            />
+            {/* Work */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Work
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter your work or experience"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
+            {/* Education */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Education
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter your education"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
+            {/* Skills */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Skills
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter your skills separated by commas"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
           </div>
         </section>
+
 
       </div>
     </div>
