@@ -11,6 +11,9 @@ const [readMe, setReadMe] = useState("");
 const [workExperience, setWorkExperience] = useState("");
 const [education, setEducation] = useState("");
 const [skills, setSkills] = useState("");
+const [currentLearning, setCurrentLearning] = useState("");
+const [interests, setInterests] = useState("");
+const [learningGoals, setLearningGoals] = useState("");
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
@@ -237,6 +240,8 @@ const [skills, setSkills] = useState("");
               <input
                 type="text"
                 placeholder="What are you currently learning?"
+                  value={currentLearning}
+                onChange={(e) => setCurrentLearning(e.target.value)} 
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -250,6 +255,8 @@ const [skills, setSkills] = useState("");
               <input
                 type="text"
                 placeholder="Enter your interests"
+                  value={interests}
+                onChange={(e) => setInterests(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -263,6 +270,8 @@ const [skills, setSkills] = useState("");
               <textarea
                 rows={4}
                 placeholder="Enter your learning goals"
+                  value={learningGoals}
+                onChange={(e) => setLearningGoals(e.target.value)}
                 className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
