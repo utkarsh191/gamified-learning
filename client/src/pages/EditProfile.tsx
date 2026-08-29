@@ -6,6 +6,8 @@ const [location, setLocation] = useState("");
 const [githubUsername, setGithubUsername] = useState("");
 const [linkedinUsername, setLinkedinUsername] = useState("");
 const [leetcodeUsername, setLeetcodeUsername] = useState("");
+const [xUsername, setXUsername] = useState("");
+const [readMe, setReadMe] = useState("");
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
@@ -127,6 +129,8 @@ const [leetcodeUsername, setLeetcodeUsername] = useState("");
               <input
                 type="text"
                 placeholder="Enter your X username"
+                value={xUsername}
+                onChange={(e) => setXUsername(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -140,6 +144,8 @@ const [leetcodeUsername, setLeetcodeUsername] = useState("");
               <textarea
                 rows={5}
                 placeholder="Write something about yourself..."
+                value={readMe}
+                onChange={(e) => setReadMe(e.target.value)}
                 className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
