@@ -24,15 +24,28 @@ function EditProfile() {
         </section>
 
         {/* General */}
-<section className="mt-10">
-  <h2 className="text-xl font-bold">
-    General
-  </h2>
+        <section>
+          <h2 className="text-xl font-bold">
+            General
+          </h2>
 
-  <p className="mt-1 text-sm text-gray-400">
-    Manage your basic profile information.
-  </p>
-</section>
+          <p className="mt-1 text-sm text-gray-400">
+            Manage your basic profile information.
+          </p>
+
+          {/* Display Name */}
+          <div className="mt-5">
+            <label className="mb-2 block font-semibold">
+              Display Name
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter your display name"
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+            />
+          </div>
+        </section>
 
       </div>
     </div>
