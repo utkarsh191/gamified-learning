@@ -1,8 +1,11 @@
 import { useState } from "react";
 
   function EditProfile() {
-  const [displayName, setDisplayName] = useState("");
-  const [location, setLocation] = useState("");
+ const [displayName, setDisplayName] = useState("");
+const [location, setLocation] = useState("");
+const [githubUsername, setGithubUsername] = useState("");
+const [linkedinUsername, setLinkedinUsername] = useState("");
+const [leetcodeUsername, setLeetcodeUsername] = useState("");
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
@@ -79,6 +82,8 @@ import { useState } from "react";
               <input
                 type="text"
                 placeholder="Enter your GitHub username"
+                value={githubUsername}
+                onChange={(e) => setGithubUsername(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -92,6 +97,8 @@ import { useState } from "react";
               <input
                 type="text"
                 placeholder="Enter your LinkedIn username"
+                value={linkedinUsername}
+                onChange={(e) => setLinkedinUsername(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -105,6 +112,8 @@ import { useState } from "react";
               <input
                 type="text"
                 placeholder="Enter your LeetCode username"
+                value={leetcodeUsername}
+                onChange={(e) => setLeetcodeUsername(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
