@@ -237,7 +237,84 @@ function EditProfile() {
           </div>
         </section>
 
-      
+        {/* Curate Your Profile */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold">
+            Curate your profile
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-400">
+            Control what opens to the public.
+          </p>
+
+          <div className="mt-5 space-y-4">
+
+            {/* Coding Activity */}
+            <div className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-800 px-5 py-4">
+              <div>
+                <p className="font-semibold">
+                  Coding Activity
+                </p>
+
+                <p className="mt-1 text-sm text-gray-400">
+                  Show your coding activity on profile
+                </p>
+              </div>
+
+              <input
+                type="checkbox"
+                className="h-5 w-5"
+              />
+            </div>
+
+            {/* Achievements */}
+            <div className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-800 px-5 py-4">
+              <div>
+                <p className="font-semibold">
+                  Achievements
+                </p>
+
+                <p className="mt-1 text-sm text-gray-400">
+                  Show your achievements on profile
+                </p>
+              </div>
+
+              <input
+                type="checkbox"
+                className="h-5 w-5"
+              />
+            </div>
+
+            {/* Learning Progress */}
+            <div className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-800 px-5 py-4">
+              <div>
+                <p className="font-semibold">
+                  Learning Progress
+                </p>
+
+                <p className="mt-1 text-sm text-gray-400">
+                  Show your learning progress on profile
+                </p>
+              </div>
+
+              <input
+                type="checkbox"
+                className="h-5 w-5"
+              />
+            </div>
+
+          </div>
+        </section>
+
+        {/* Save Button */}
+        <div className="mt-10 pb-10">
+          <button
+            type="button"
+            className="rounded-lg bg-blue-600 px-8 py-3 font-semibold transition hover:bg-blue-700"
+          >
+            Save Changes
+          </button>
+        </div>
 
       </div>
     </div>
