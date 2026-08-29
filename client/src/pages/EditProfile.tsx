@@ -15,7 +15,7 @@ const [currentLearning, setCurrentLearning] = useState("");
 const [interests, setInterests] = useState("");
 const [learningGoals, setLearningGoals] = useState("");
 
-const handleSave = () => {
+const handleSave = async () => {
   const profileData = {
     displayName,
     location,
@@ -32,7 +32,21 @@ const handleSave = () => {
     learningGoals,
   };
 
-  console.log(profileData);
+  try {
+  const response = await fetch("http://localhost:5000/api/profile", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(profileData),
+  });
+
+  const data = await response.json();
+
+  console.log(data);
+} catch (error) {
+  console.error("Failed to save profile:", error);
+}
 };
 
   return (
