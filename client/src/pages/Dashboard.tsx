@@ -30,7 +30,7 @@ function Dashboard() {
             {/* Profile Circle */}
             <Link
             to="/profile"
-              className="w-11 h-11 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition"
+              className="w-11 h-11 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center"
             >
                U
             </Link>
