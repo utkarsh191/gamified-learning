@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
@@ -26,11 +28,12 @@ function Dashboard() {
             </div>
 
             {/* Profile Circle */}
-            <button
+            <Link
+            to="/profile"
               className="w-11 h-11 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition"
             >
                U
-            </button>
+            </Link>
 
             {/* Premium */}
             <button
