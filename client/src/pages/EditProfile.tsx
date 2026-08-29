@@ -23,6 +23,17 @@ function EditProfile() {
           </div>
         </section>
 
+        {/* General */}
+<section className="mt-10">
+  <h2 className="text-xl font-bold">
+    General
+  </h2>
+
+  <p className="mt-1 text-sm text-gray-400">
+    Manage your basic profile information.
+  </p>
+</section>
+
       </div>
     </div>
   );
