@@ -45,6 +45,19 @@ function EditProfile() {
               className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
             />
           </div>
+
+          {/* Location */}
+          <div className="mt-5">
+            <label className="mb-2 block font-semibold">
+              Location
+            </label>
+
+            <input
+              type="text"
+              placeholder="Enter your location"
+              className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+            />
+          </div>
         </section>
 
       </div>
