@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 function Profile() {
   return (
     <div className="min-h-screen bg-gray-900 px-6 py-8 text-white">
@@ -37,11 +39,12 @@ function Profile() {
               </p>
             </div>
 
-            <button
+            <Link
+              to="/edit-profile"
               className="rounded-lg bg-green-600 px-6 py-3 font-semibold transition hover:bg-green-700"
             >
               Edit Profile
-            </button>
+            </Link>
           </div>
         </section>
 
