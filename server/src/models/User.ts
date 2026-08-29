@@ -2,6 +2,18 @@ import mongoose, { Document, Schema } from "mongoose";
 
 export interface IUser extends Document {
   name: string;
+  location?: string;
+  githubUsername?: string;
+  linkedinUsername?: string;
+  leetcodeUsername?: string;
+  xUsername?: string;
+  readMe?: string;
+  workExperience?: string;
+  education?: string;
+  skills?: string;
+  currentLearning?: string;
+  interests?: string;
+  learningGoals?: string;
   email: string;
   password: string;
   role: "student" | "admin";
@@ -14,6 +26,66 @@ const userSchema = new Schema<IUser>(
       required: true,
       trim: true,
     },
+
+    location: {
+  type: String,
+  trim: true,
+},
+
+githubUsername: {
+  type: String,
+  trim: true,
+},
+
+linkedinUsername: {
+  type: String,
+  trim: true,
+},
+
+leetcodeUsername: {
+  type: String,
+  trim: true,
+},
+
+xUsername: {
+  type: String,
+  trim: true,
+},
+
+readMe: {
+  type: String,
+  trim: true,
+},
+
+workExperience: {
+  type: String,
+  trim: true,
+},
+
+education: {
+  type: String,
+  trim: true,
+},
+
+skills: {
+  type: String,
+  trim: true,
+},
+
+currentLearning: {
+  type: String,
+  trim: true,
+},
+
+interests: {
+  type: String,
+  trim: true,
+},
+
+learningGoals: {
+  type: String,
+  trim: true,
+},
 
     email: {
       type: String,
