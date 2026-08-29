@@ -1,8 +1,11 @@
 import express from "express";
 
+import { protect } from "../middleware/authMiddleware.js";
+
 const router = express.Router();
 
-router.put("/", (req, res) => {
+router.put("/", protect, (req, res) => {
+  console.log(req.user);
   console.log(req.body);
 
   res.status(200).json({
