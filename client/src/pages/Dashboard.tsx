@@ -32,6 +32,13 @@ function Dashboard() {
               U
             </button>
 
+            {/* Premium */}
+            <button
+              className="bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-semibold px-5 py-2 rounded-lg transition"
+            >
+              👑 Premium
+            </button>
+
           </div>
         </div>
       </nav>
