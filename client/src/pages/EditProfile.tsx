@@ -183,6 +183,61 @@ function EditProfile() {
           </div>
         </section>
 
+        {/* Learning */}
+        <section className="mt-10">
+          <h2 className="text-xl font-bold">
+            Learning
+          </h2>
+
+          <p className="mt-1 text-sm text-gray-400">
+            Tell others what you are currently learning.
+          </p>
+
+          <div className="mt-5 space-y-5">
+
+            {/* Current Learning */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Current Learning
+              </label>
+
+              <input
+                type="text"
+                placeholder="What are you currently learning?"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
+            {/* Interests */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Interests
+              </label>
+
+              <input
+                type="text"
+                placeholder="Enter your interests"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
+            {/* Learning Goals */}
+            <div>
+              <label className="mb-2 block font-semibold">
+                Learning Goals
+              </label>
+
+              <textarea
+                rows={4}
+                placeholder="Enter your learning goals"
+                className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
+            </div>
+
+          </div>
+        </section>
+
+      
 
       </div>
     </div>
