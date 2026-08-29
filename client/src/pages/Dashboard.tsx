@@ -11,17 +11,28 @@ function Dashboard() {
             🎮 Gamified Learning
           </div>
 
-          {/* College Rank */}
-          <div className="text-center">
-            <p className="text-gray-400 text-sm">
-              Your College Rank
-            </p>
+          {/* Right Side */}
+          <div className="flex items-center gap-6">
 
-            <p className="text-white font-bold text-lg">
-              #12
-            </p>
+            {/* College Rank */}
+            <div className="text-center">
+              <p className="text-gray-400 text-sm">
+                Your College Rank
+              </p>
+
+              <p className="text-white font-bold text-lg">
+                #12
+              </p>
+            </div>
+
+            {/* Profile Circle */}
+            <button
+              className="w-11 h-11 rounded-full bg-blue-600 text-white font-bold text-lg hover:bg-blue-700 transition"
+            >
+              U
+            </button>
+
           </div>
-
         </div>
       </nav>
 
