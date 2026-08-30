@@ -28,7 +28,7 @@ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   try {
-    const data = await registerUser(name, email, password);
+    const data = await registerUser(name, username, email, password);
 
     console.log("Signup successful:", data);
   } catch (error) {
@@ -81,8 +81,8 @@ const handleSubmit = async (e: React.FormEvent) => {
             setUsernameError(error);            
           }}
            placeholder="Choose a username"
-          className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-500"
-          required
+           className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-500"
+           required
           />
           {usernameError && (
             <p className="mt-2 text-sm text-red-400">
