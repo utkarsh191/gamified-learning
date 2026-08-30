@@ -16,10 +16,10 @@ function Signup() {
     if (value.length < 7 || value.length > 20) {
       return "Username must be between 3 and 20 characters";
     }
-
+     
     if (!usernameRegex.test(value)) {
-      return "Username can only contain letters, numbers and underscore";
-    }
+    return "Username can only contain letters, numbers and underscore";
+  }
 
     return "";
   };
