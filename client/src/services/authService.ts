@@ -4,11 +4,13 @@ const API_URL = "http://localhost:5000/api/auth";
 
 export const registerUser = async (
   name: string,
+  username: string,
   email: string,
   password: string
 ) => {
   const response = await axios.post(`${API_URL}/register`, {
     name,
+    username,
     email,
     password,
   });

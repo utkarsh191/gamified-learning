@@ -5,11 +5,12 @@ import User from "../models/User.js";
 
 export const register = async (req: Request, res: Response) => {
   try {
+    console.log("REGISTER BODY:", req.body);
     const { name, username, email, password } = req.body;
 
     if (!name || !username || !email || !password) {
       return res.status(400).json({
-        message: "Name, email and password are required",
+        message: "Name, username, email and password are required",
       });
     }
 

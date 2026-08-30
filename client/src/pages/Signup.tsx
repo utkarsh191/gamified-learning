@@ -14,7 +14,7 @@ function Signup() {
       /^[a-zA-Z0-9](?:[a-zA-Z0-9_]{1,18}[a-zA-Z0-9])?$/;
 
     if (value.length < 7 || value.length > 20) {
-      return "Username must be between 3 and 20 characters";
+      return "Username must be between 7 and 20 characters";
     }
      
     if (!usernameRegex.test(value)) {
@@ -26,6 +26,14 @@ function Signup() {
 
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+
+  const error = validateUsername(username);
+
+  if(error) {
+    setUsernameError(error);
+    return;
+  }
+  
 
   try {
     const data = await registerUser(name, username, email, password);
