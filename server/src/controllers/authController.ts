@@ -48,8 +48,16 @@ export const register = async (req: Request, res: Response) => {
         role: user.role,
       },
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Register error:", error);
+
+     if (error.code === 11000) {
+    const field = Object.keys(error.keyPattern)[0];
+
+     return res.status(409).json({
+      message: `${field} already exists`,
+    });
+  }
 
     return res.status(500).json({
       message: "Server error",
