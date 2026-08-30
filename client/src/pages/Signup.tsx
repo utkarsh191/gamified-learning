@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 function Signup() {
   const [name, setName] = useState("");
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -45,6 +46,20 @@ const handleSubmit = async (e: React.FormEvent) => {
               required
             />
           </div>
+
+        <div>
+          <label className="block text-gray-300 mb-2">
+            Username
+          </label>
+          <input 
+          type="text" 
+          value={username}
+          placeholder="Choose a username"
+          onChange={(e) => setUsername(e.target.value)}
+          className="w-full px-4 py-3 rounded-lg bg-gray-700 text-white outline-none focus:ring-2 focus:ring-blue-500"
+          required
+          />
+        </div>
 
           <div>
             <label className="block text-gray-300 mb-2">
