@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { registerUser } from "../services/authService";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function Signup() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -38,7 +40,9 @@ const handleSubmit = async (e: React.FormEvent) => {
   try {
     const data = await registerUser(name, username, email, password);
 
+    localStorage.setItem("token", data.token);
     console.log("Signup successful:", data);
+    navigate("/dashboard");
   } catch (error) {
     console.error("Signup failed:", error);
   }
