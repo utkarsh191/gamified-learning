@@ -121,7 +121,7 @@ const handleSave = async () => {
             </div>
 
             {/* College name */}
-            <div>
+            <div className="mt-4">
               <label className="block text-white mb-2">
                 College
               </label>
