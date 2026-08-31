@@ -1,5 +1,27 @@
 import { Request, Response } from "express";
 
+const GITHUB_API_BASE = "https://api.github.com";
+
+const XP_RULES = {
+  COMMIT: 1,
+  PULL_REQUEST: 10,
+  MERGED_PULL_REQUEST: 15,
+  ISSUE: 3,
+  PULL_REQUEST_REVIEW: 5,
+} as const;
+
+// Controlled concurrency limit for per-PR review fetches.
+// Keeps requests well under GitHub's secondary rate limits without going
+// fully sequential (which was the original bottleneck).
+const REVIEW_FETCH_CONCURRENCY = 15;
+
+// GitHub Search API only lets you page through the first 1000 matching
+// ITEMS per query (total_count itself stays accurate beyond that). When we
+// need actual PR objects — not just a count — we split by PR creation-date
+// so each chunk stays under 1000 and older history is never dropped.
+const SEARCH_ITEM_CAP = 1000;
+const MIN_DATE_RANGE_DAYS = 1; // recursion floor — guarantees no infinite loop
+
 interface GithubRepo {
   name: string;
   [key: string]: any;
@@ -13,6 +35,11 @@ interface GithubSearchIssueItem {
 
 interface GithubReview {
   user: { login: string } | null;
+  [key: string]: any;
+}
+
+interface GithubUser {
+  created_at: string;
   [key: string]: any;
 }
 
@@ -39,17 +66,6 @@ interface GithubActivityResponse {
   totalGithubXP: number;
 }
 
-const GITHUB_API_BASE = "https://api.github.com";
-
-// Fixed XP rules — do not change
-const XP_RULES = {
-  COMMIT: 1,
-  PULL_REQUEST: 10,
-  MERGED_PULL_REQUEST: 15,
-  ISSUE: 3,
-  PULL_REQUEST_REVIEW: 5,
-} as const;
-
 const githubHeaders = () => ({
   Accept: "application/vnd.github+json",
   Authorization: `Bearer ${process.env.GITHUB_TOKEN}`,
@@ -57,9 +73,39 @@ const githubHeaders = () => ({
 });
 
 /**
- * Runs a GitHub Search API query and returns total_count.
- * Used for pullRequests, mergedPullRequests, issues — where we only need
- * the count, not the individual items, so total_count is accurate and cheap.
+ * Runs `worker` over `items` with at most `limit` requests in flight at
+ * once. This is a small worker pool: each "lane" keeps pulling the next
+ * item off a shared cursor until the list is exhausted — instead of firing
+ * everything at once (unlimited Promise.all) or one request at a time.
+ */
+async function runWithConcurrencyLimit<T, R>(
+  items: T[],
+  limit: number,
+  worker: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results: R[] = new Array(items.length);
+  let cursor = 0;
+
+  const lanes = Array.from(
+    { length: Math.min(limit, items.length) },
+    async () => {
+      while (cursor < items.length) {
+        const currentIndex = cursor;
+        cursor++;
+        results[currentIndex] = await worker(items[currentIndex]);
+      }
+    }
+  );
+
+  await Promise.all(lanes);
+  return results;
+}
+
+/**
+ * Search API's `total_count` is accurate even for result sets larger than
+ * 1000 — the 1000 cap only limits how many *items* you can page through,
+ * not the count GitHub reports. So for pure counting (PRs, merged PRs,
+ * issues) a single query is correct and fast; no date-splitting needed.
  */
 const fetchSearchCount = async (query: string): Promise<number> => {
   const response = await fetch(
@@ -78,13 +124,10 @@ const fetchSearchCount = async (query: string): Promise<number> => {
 };
 
 /**
- * Runs a GitHub Search API query and returns ALL matching items (paginated).
- * Search API caps at 1000 results total (10 pages x 100 per_page) — this is
- * a hard GitHub limit, not something we can bypass.
- * Used here to get the actual list of PRs the user reviewed, so we can then
- * fetch real review events for each one.
+ * Fetches every item (not just a count) matching a query, paginated up to
+ * GitHub's 1000-result ceiling for a single query.
  */
-const fetchSearchItems = async (
+const fetchSearchItemsPage = async (
   query: string
 ): Promise<GithubSearchIssueItem[]> => {
   const items: GithubSearchIssueItem[] = [];
@@ -114,7 +157,7 @@ const fetchSearchItems = async (
     items.push(...pageItems);
     page++;
 
-    if (pageItems.length < 100 || items.length >= 1000) {
+    if (pageItems.length < 100 || items.length >= SEARCH_ITEM_CAP) {
       break;
     }
   }
@@ -122,16 +165,83 @@ const fetchSearchItems = async (
   return items;
 };
 
+const toDateOnly = (d: Date): string => d.toISOString().slice(0, 10);
+
+const daysBetween = (start: Date, end: Date): number =>
+  Math.round((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+
 /**
- * Given a PR's repository_url + number, fetches ALL reviews on that PR
- * (paginated) and counts only reviews actually performed by `username`.
+ * Recursively fetches ALL items matching `baseQuery` within [start, end],
+ * splitting the date range in half whenever a chunk's count would exceed
+ * the 1000-item search cap. This is what lets us retrieve a user's full
+ * historical activity (5, 10+ years) instead of silently losing anything
+ * beyond the first 1000 matches of one giant query.
+ */
+async function fetchSearchItemsForDateRange(
+  baseQuery: string,
+  start: Date,
+  end: Date
+): Promise<GithubSearchIssueItem[]> {
+  const rangedQuery = `${baseQuery} created:${toDateOnly(start)}..${toDateOnly(
+    end
+  )}`;
+
+  const count = await fetchSearchCount(rangedQuery);
+
+  if (count === 0) {
+    return [];
+  }
+
+  const rangeIsAtFloor = daysBetween(start, end) <= MIN_DATE_RANGE_DAYS;
+
+  if (count < SEARCH_ITEM_CAP || rangeIsAtFloor) {
+    // Safe to fetch directly. (A single day with 1000+ matching review
+    // events is not realistic — the floor just guarantees termination.)
+    return fetchSearchItemsPage(rangedQuery);
+  }
+
+  // Split the range in half and recurse on each half independently
+  const midpoint = new Date(
+    start.getTime() + Math.floor((end.getTime() - start.getTime()) / 2)
+  );
+  const dayMs = 1000 * 60 * 60 * 24;
+
+  const [firstHalf, secondHalf] = await Promise.all([
+    fetchSearchItemsForDateRange(baseQuery, start, midpoint),
+    fetchSearchItemsForDateRange(
+      baseQuery,
+      new Date(midpoint.getTime() + dayMs),
+      end
+    ),
+  ]);
+
+  return [...firstHalf, ...secondHalf];
+}
+
+/**
+ * Entry point: fetches all items for `baseQuery` across the user's entire
+ * GitHub history, starting from their account creation date — never a
+ * hardcoded "recent years only" assumption.
+ */
+async function fetchAllHistoricalSearchItems(
+  baseQuery: string,
+  accountCreatedAt: string
+): Promise<GithubSearchIssueItem[]> {
+  const start = new Date(accountCreatedAt);
+  const end = new Date();
+  return fetchSearchItemsForDateRange(baseQuery, start, end);
+}
+
+/**
+ * Fetches ALL reviews on a single PR (paginated) and counts only the ones
+ * actually performed by `username` — not reviews received, not general
+ * comments, not reviews by other people.
  */
 const countUserReviewsOnPR = async (
   repositoryUrl: string,
   pullNumber: number,
   username: string
 ): Promise<number> => {
-  // repository_url looks like "https://api.github.com/repos/owner/repo"
   const repoPath = repositoryUrl.replace(`${GITHUB_API_BASE}/repos/`, "");
 
   let reviewCount = 0;
@@ -143,8 +253,8 @@ const countUserReviewsOnPR = async (
       { headers: githubHeaders() }
     );
 
-    // If a PR's reviews can't be fetched (e.g. repo went private/deleted
-    // since search indexed it), skip it rather than crashing the request
+    // If a PR's reviews can't be fetched (repo renamed/deleted since the
+    // search index was built, etc.), skip it — don't crash the request
     if (!response.ok) {
       break;
     }
@@ -193,6 +303,21 @@ export const getGithubActivity = async (
       });
     }
 
+    // 0. Get account creation date — this is what lets us search the
+    // user's ENTIRE history instead of guessing a hardcoded start year.
+    const userResponse = await fetch(`${GITHUB_API_BASE}/users/${username}`, {
+      headers: githubHeaders(),
+    });
+
+    if (!userResponse.ok) {
+      return res.status(userResponse.status).json({
+        message: "GitHub user not found or GitHub API error",
+      });
+    }
+
+    const githubUser: GithubUser = await userResponse.json();
+    const accountCreatedAt = githubUser.created_at;
+
     // 1. Fetch ALL public repositories (paginated) — unchanged
     const repos: GithubRepo[] = [];
     let repoPage = 1;
@@ -223,7 +348,10 @@ export const getGithubActivity = async (
       }
     }
 
-    // 2. Fetch ALL commits by this user across ALL public repos — unchanged
+    // 2. Fetch ALL commits by this user across ALL public repos — unchanged.
+    // Uses the repo commits endpoint directly, not Search API, so it isn't
+    // subject to the 1000-result search cap — pagination alone covers a
+    // repo's full history, however many years it spans.
     let totalCommits = 0;
 
     for (const repo of repos) {
@@ -255,39 +383,42 @@ export const getGithubActivity = async (
       }
     }
 
-    // 3. Pull Requests created by this user — unchanged
-    const pullRequests = await fetchSearchCount(
-      `author:${username} type:pr`
+    // 3, 4, 5. Pull Requests / Merged Pull Requests / Issues.
+    // Only need total_count, which Search API reports accurately even
+    // beyond 1000 — a single query each is correct. Run concurrently since
+    // they're independent (3 requests total, no rate-limit concern).
+    const [pullRequests, mergedPullRequests, issues] = await Promise.all([
+      fetchSearchCount(`author:${username} type:pr`),
+      fetchSearchCount(`author:${username} type:pr is:merged`),
+      fetchSearchCount(`author:${username} type:issue`),
+    ]);
+
+    // 6. Pull Request Reviews — ACTUAL review event count.
+    //
+    // Step A: find every PR this user reviewed (excluding their own PRs)
+    // across their entire account history. We need real PR items here
+    // (not just a count) so we can query each PR's reviews — that's why
+    // this goes through the date-splitting historical search.
+    const reviewedPRs = await fetchAllHistoricalSearchItems(
+      `reviewed-by:${username} type:pr -author:${username}`,
+      accountCreatedAt
     );
 
-    // 4. Merged Pull Requests only — unchanged
-    const mergedPullRequests = await fetchSearchCount(
-      `author:${username} type:pr is:merged`
+    // Step B: for each PR, fetch its reviews and count only this user's —
+    // via controlled concurrency instead of one-by-one sequential calls or
+    // an unlimited Promise.all() over potentially thousands of PRs.
+    const reviewCountsPerPR = await runWithConcurrencyLimit(
+      reviewedPRs,
+      REVIEW_FETCH_CONCURRENCY,
+      (pr) => countUserReviewsOnPR(pr.repository_url, pr.number, username)
     );
 
-    // 5. Issues created by this user (PRs excluded) — unchanged
-    const issues = await fetchSearchCount(
-      `author:${username} type:issue`
+    const pullRequestReviews = reviewCountsPerPR.reduce(
+      (sum, count) => sum + count,
+      0
     );
 
-    // 6. Pull Request Reviews — ACTUAL review event count
-    // Step A: get every PR this user reviewed (excluding their own PRs)
-    const reviewedPRs = await fetchSearchItems(
-      `reviewed-by:${username} type:pr -author:${username}`
-    );
-
-    // Step B: for each PR, fetch its reviews and count only this user's
-    let pullRequestReviews = 0;
-
-    for (const pr of reviewedPRs) {
-      pullRequestReviews += await countUserReviewsOnPR(
-        pr.repository_url,
-        pr.number,
-        username
-      );
-    }
-
-    // XP calculation — values fixed per your rules, not configurable here
+    // XP calculation — values fixed per your rules
     const commitXP = totalCommits * XP_RULES.COMMIT;
     const pullRequestXP = pullRequests * XP_RULES.PULL_REQUEST;
     const mergedPullRequestXP =
@@ -297,11 +428,7 @@ export const getGithubActivity = async (
       pullRequestReviews * XP_RULES.PULL_REQUEST_REVIEW;
 
     const totalGithubXP =
-      commitXP +
-      pullRequestXP +
-      mergedPullRequestXP +
-      issueXP +
-      pullRequestReviewXP;
+      commitXP + pullRequestXP + mergedPullRequestXP + issueXP + pullRequestReviewXP;
 
     const responseBody: GithubActivityResponse = {
       username,
