@@ -1,6 +1,28 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { getProfile } from "../services/profileService";
 
 function Profile() {
+
+    const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+        setUser(data.user);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  if (!user) {
+    return <div className="text-white p-8">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 px-6 py-8 text-white">
       <div className="mx-auto max-w-5xl">
@@ -10,16 +32,16 @@ function Profile() {
           <div className="flex flex-col items-start gap-6 md:flex-row">
 
             <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-gray-700 text-4xl font-bold">
-              U
+              {user.name?.charAt(0).toUpperCase()}
             </div>
 
             <div className="flex-1">
               <h1 className="text-3xl font-bold">
-                Utkarsh Kesharwani
+                 {user.name}
               </h1>
 
               <p className="mt-1 text-blue-400">
-                @utkarsh
+                 @{user.username}
               </p>
 
               <p className="mt-4 text-gray-300">
