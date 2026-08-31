@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { colleges } from "../data/colleges";
 
   function EditProfile() {
  const [displayName, setDisplayName] = useState("");
@@ -14,10 +15,12 @@ const [skills, setSkills] = useState("");
 const [currentLearning, setCurrentLearning] = useState("");
 const [interests, setInterests] = useState("");
 const [learningGoals, setLearningGoals] = useState("");
+const [college, setCollege] = useState("");
 
 const handleSave = async () => {
   const profileData = {
-    displayName,
+    name: displayName,
+    college,
     location,
     githubUsername,
     linkedinUsername,
@@ -99,6 +102,26 @@ const handleSave = async () => {
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
+
+            {/* College name */}
+            <div>
+              <label className="block text-white mb-2">
+                College
+              </label>
+              <select 
+                value={college}
+                onChange={(e) => setCollege(e.target.value)}
+                className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                 <option value="">Add your college</option>
+                 {colleges.map((collegeName) => (
+                   <option key={collegeName} value={collegeName}>
+                     {collegeName}
+                   </option>
+                 ))}
+              </select>
+            </div>
+
 
             {/* Location */}
             <div>

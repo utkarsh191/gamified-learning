@@ -49,9 +49,17 @@ function Profile() {
                 and Algorithms.
               </p>
 
+             {user.college ? (
               <p className="mt-4 text-gray-400">
-                 🎓 {user.college || "Add your college"}
+                 🎓 {user.college}
               </p>
+             ): (<Link
+                  to="/edit-profile"
+                  className="mt-4 block text-blue-400 hover:text-blue-300"
+                  >
+                     🎓 Add your college
+                     </Link>
+                 )}
 
               <p className="mt-2 text-gray-300">
                 🏆 Global Rank{" "}
