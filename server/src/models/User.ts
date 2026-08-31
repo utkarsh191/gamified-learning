@@ -3,6 +3,7 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IUser extends Document {
   name: string;
   username: string;
+  college?: string;
   location?: string;
   githubUsername?: string;
   linkedinUsername?: string;
@@ -35,6 +36,11 @@ const userSchema = new Schema<IUser>(
   trim: true,
   lowercase: true,
 },
+
+ college: {
+      type: String,
+      trim: true,
+    },
 
     location: {
   type: String,

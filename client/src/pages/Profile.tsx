@@ -50,7 +50,7 @@ function Profile() {
               </p>
 
               <p className="mt-4 text-gray-400">
-                🎓 Rajkiya Engineering College, Azamgarh
+                 🎓 {user.college || "Add your college"}
               </p>
 
               <p className="mt-2 text-gray-300">
