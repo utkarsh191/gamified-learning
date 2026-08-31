@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getProfile } from "../services/profileService";
 import { colleges } from "../data/colleges";
 
   function EditProfile() {
@@ -16,6 +17,22 @@ const [currentLearning, setCurrentLearning] = useState("");
 const [interests, setInterests] = useState("");
 const [learningGoals, setLearningGoals] = useState("");
 const [college, setCollege] = useState("");
+
+useEffect(() => {
+  const fetchProfile = async () => {
+    try {
+      const data = await getProfile();
+
+      setDisplayName(data.user.name);
+      setCollege(data.user.college || "");
+    } catch (error) {
+      console.error("Failed to fetch profile:", error);
+    }
+  };
+
+  fetchProfile();
+}, []);
+
 
 const handleSave = async () => {
   const profileData = {
