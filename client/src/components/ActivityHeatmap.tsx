@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { getGithubActivity } from "../services/githubService";
 import { getLeetcodeActivity } from "../services/leetcodeService";
+import {
+  getHeatmapCache,
+  saveHeatmapCache,
+  DailyActivityEntry,
+} from "../services/activityService";
 
 interface ActivityHeatmapProps {
   githubUsername?: string;
@@ -12,9 +17,14 @@ interface DailyCount {
   count: number;
 }
 
+interface DayBreakdown {
+  githubCount: number;
+  leetcodeCount: number;
+}
+
 interface DaySquare {
   date: string; // "YYYY-MM-DD"
-  count: number;
+  breakdown: DayBreakdown;
   inCurrentRange: boolean; // false for padding squares before Jan 1 / after Dec 31
 }
 
@@ -25,6 +35,8 @@ const MONTH_LABELS = [
 
 const toDateOnly = (d: Date): string => d.toISOString().slice(0, 10);
 
+const totalForDay = (b: DayBreakdown): number => b.githubCount + b.leetcodeCount;
+
 const getIntensityClass = (count: number): string => {
   if (count === 0) return "bg-gray-700";
   if (count <= 2) return "bg-green-900";
@@ -33,12 +45,34 @@ const getIntensityClass = (count: number): string => {
   return "bg-green-400";
 };
 
+const formatDisplayDate = (dateStr: string): string => {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+    timeZone: "UTC",
+  });
+};
+
+// Builds a tooltip string for one day. Uses \n so the native `title`
+// attribute renders it as multiple lines — no extra tooltip UI library
+// needed for this.
+const buildTooltip = (date: string, breakdown: DayBreakdown): string => {
+  const points = totalForDay(breakdown);
+  return [
+    formatDisplayDate(date),
+    `GitHub: ${breakdown.githubCount} commit${breakdown.githubCount === 1 ? "" : "s"}`,
+    `LeetCode: ${breakdown.leetcodeCount} submission${breakdown.leetcodeCount === 1 ? "" : "s"}`,
+    `Activity Points: ${points}`,
+  ].join("\n");
+};
+
 // Builds every day of `year` (Jan 1 -> Dec 31), padded at both ends so the
-// grid starts on a Sunday and ends on a Saturday — same layout convention
-// GitHub/LeetCode use for their weekly-column grid.
+// grid starts on a Sunday and ends on a Saturday.
 const buildYearGrid = (
   year: number,
-  activityMap: Record<string, number>
+  breakdownMap: Record<string, DayBreakdown>
 ): DaySquare[] => {
   const jan1 = new Date(Date.UTC(year, 0, 1));
   const dec31 = new Date(Date.UTC(year, 11, 31));
@@ -50,31 +84,30 @@ const buildYearGrid = (
     const dateStr = toDateOnly(cursor);
     days.push({
       date: dateStr,
-      count: activityMap[dateStr] ?? 0,
+      breakdown: breakdownMap[dateStr] ?? { githubCount: 0, leetcodeCount: 0 },
       inCurrentRange: true,
     });
     cursor.setUTCDate(cursor.getUTCDate() + 1);
   }
 
-  const paddingBefore = jan1.getUTCDay(); // 0 = Sunday
+  const paddingBefore = jan1.getUTCDay();
   const paddingAfter = 6 - dec31.getUTCDay();
 
   const before: DaySquare[] = Array.from({ length: paddingBefore }, (_, i) => ({
     date: `pad-before-${i}`,
-    count: 0,
+    breakdown: { githubCount: 0, leetcodeCount: 0 },
     inCurrentRange: false,
   }));
 
   const after: DaySquare[] = Array.from({ length: paddingAfter }, (_, i) => ({
     date: `pad-after-${i}`,
-    count: 0,
+    breakdown: { githubCount: 0, leetcodeCount: 0 },
     inCurrentRange: false,
   }));
 
   return [...before, ...days, ...after];
 };
 
-// Groups the padded day list into weekly columns of 7 (Sun -> Sat each).
 const groupIntoWeeks = (days: DaySquare[]): DaySquare[][] => {
   const weeks: DaySquare[][] = [];
   for (let i = 0; i < days.length; i += 7) {
@@ -83,9 +116,6 @@ const groupIntoWeeks = (days: DaySquare[]): DaySquare[][] => {
   return weeks;
 };
 
-// For each week column, figure out which month label (if any) should sit
-// above it — the label goes on the first week where that month's 1st
-// falls, matching GitHub/LeetCode's month-header positioning.
 const getMonthLabelPositions = (weeks: DaySquare[][]): (string | null)[] => {
   const labels: (string | null)[] = new Array(weeks.length).fill(null);
   let lastMonth = -1;
@@ -105,10 +135,10 @@ const getMonthLabelPositions = (weeks: DaySquare[][]): (string | null)[] => {
 };
 
 // Own streak calculation from the merged GitHub+LeetCode daily activity —
-// never read from GitHub's or LeetCode's own streak numbers directly.
-const calculateStreaks = (activityMap: Record<string, number>) => {
-  const activeDates = Object.keys(activityMap)
-    .filter((date) => activityMap[date] > 0)
+// never reads GitHub's or LeetCode's own streak numbers directly.
+const calculateStreaks = (breakdownMap: Record<string, DayBreakdown>) => {
+  const activeDates = Object.keys(breakdownMap)
+    .filter((date) => totalForDay(breakdownMap[date]) > 0)
     .sort();
 
   if (activeDates.length === 0) {
@@ -125,22 +155,13 @@ const calculateStreaks = (activityMap: Record<string, number>) => {
       (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
     );
 
-    if (diffDays === 1) {
-      runningStreak++;
-    } else {
-      runningStreak = 1;
-    }
-
+    runningStreak = diffDays === 1 ? runningStreak + 1 : 1;
     maxStreak = Math.max(maxStreak, runningStreak);
   }
 
-  // Current streak: only "alive" if the most recent active day was today
-  // or yesterday — otherwise it's broken and should show 0.
   const lastActive = activeDates[activeDates.length - 1];
   const today = toDateOnly(new Date());
-  const yesterday = toDateOnly(
-    new Date(Date.now() - 24 * 60 * 60 * 1000)
-  );
+  const yesterday = toDateOnly(new Date(Date.now() - 24 * 60 * 60 * 1000));
 
   let currentStreak = 0;
   if (lastActive === today || lastActive === yesterday) {
@@ -166,19 +187,42 @@ const calculateStreaks = (activityMap: Record<string, number>) => {
   };
 };
 
+// Converts the cached array (or freshly merged GitHub+LeetCode data) into
+// the {date -> {githubCount, leetcodeCount}} lookup the component renders
+// from.
+const toBreakdownMap = (
+  entries: DailyActivityEntry[]
+): Record<string, DayBreakdown> => {
+  const map: Record<string, DayBreakdown> = {};
+  for (const entry of entries) {
+    map[entry.date] = {
+      githubCount: entry.githubCount,
+      leetcodeCount: entry.leetcodeCount,
+    };
+  }
+  return map;
+};
+
+const toEntryArray = (
+  breakdownMap: Record<string, DayBreakdown>
+): DailyActivityEntry[] =>
+  Object.entries(breakdownMap).map(([date, b]) => ({
+    date,
+    githubCount: b.githubCount,
+    leetcodeCount: b.leetcodeCount,
+  }));
+
 function ActivityHeatmap({
   githubUsername,
   leetcodeUsername,
 }: ActivityHeatmapProps) {
-  const [activityMap, setActivityMap] = useState<Record<string, number>>({});
+  const [breakdownMap, setBreakdownMap] = useState<Record<string, DayBreakdown>>({});
+  // loading = true ONLY while we have nothing at all to show yet (no cache,
+  // no fresh data). Once anything is available, the heatmap renders and
+  // any further refresh happens silently in the background.
   const [loading, setLoading] = useState(true);
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
-  // Years available in the dropdown. LeetCode's public API only exposes a
-  // rolling ~1 year of submissionCalendar data, and GitHub commit dates
-  // come from full history — so older years will simply show fewer/no
-  // green squares until a backend cache is added later. The dropdown is
-  // wired up now so that's a pure backend change later, not a UI rewrite.
   const availableYears = useMemo(() => {
     const current = new Date().getFullYear();
     return [current, current - 1, current - 2];
@@ -187,9 +231,8 @@ function ActivityHeatmap({
   useEffect(() => {
     let cancelled = false;
 
-    const load = async () => {
-      setLoading(true);
-      const merged: Record<string, number> = {};
+    const loadFreshAndCache = async () => {
+      const merged: Record<string, DayBreakdown> = {};
       const tasks: Promise<void>[] = [];
 
       if (githubUsername) {
@@ -198,7 +241,10 @@ function ActivityHeatmap({
             .then((data) => {
               const dailyCommits: DailyCount[] = data.dailyCommits ?? [];
               for (const entry of dailyCommits) {
-                merged[entry.date] = (merged[entry.date] ?? 0) + entry.count;
+                if (!merged[entry.date]) {
+                  merged[entry.date] = { githubCount: 0, leetcodeCount: 0 };
+                }
+                merged[entry.date].githubCount += entry.count;
               }
             })
             .catch((error) => {
@@ -213,7 +259,10 @@ function ActivityHeatmap({
             .then((data) => {
               const dailySubmissions: DailyCount[] = data.dailySubmissions ?? [];
               for (const entry of dailySubmissions) {
-                merged[entry.date] = (merged[entry.date] ?? 0) + entry.count;
+                if (!merged[entry.date]) {
+                  merged[entry.date] = { githubCount: 0, leetcodeCount: 0 };
+                }
+                merged[entry.date].leetcodeCount += entry.count;
               }
             })
             .catch((error) => {
@@ -224,17 +273,46 @@ function ActivityHeatmap({
 
       await Promise.allSettled(tasks);
 
-      if (!cancelled) {
-        setActivityMap(merged);
-        setLoading(false);
+      if (cancelled) return;
+
+      // Only update on-screen state + persist to cache if something was
+      // actually fetched (avoids wiping a good cache with an empty result
+      // when GitHub/LeetCode both fail, e.g. rate limit).
+      if (Object.keys(merged).length > 0) {
+        setBreakdownMap(merged);
+        saveHeatmapCache(toEntryArray(merged)).catch((error) => {
+          console.error("Failed to save heatmap cache:", error);
+        });
       }
+
+      setLoading(false);
     };
 
-    if (githubUsername || leetcodeUsername) {
-      load();
-    } else {
-      setLoading(false);
-    }
+    const load = async () => {
+      if (!githubUsername && !leetcodeUsername) {
+        setLoading(false);
+        return;
+      }
+
+      // Step 1 — try the cache first for an instant render.
+      try {
+        const cached = await getHeatmapCache();
+        if (!cancelled && cached.data && cached.data.length > 0) {
+          setBreakdownMap(toBreakdownMap(cached.data));
+          setLoading(false); // heatmap can render now
+        }
+      } catch (error) {
+        console.error("Failed to load heatmap cache:", error);
+      }
+
+      // Step 2 — always refresh from GitHub/LeetCode in the background
+      // (silent if cache already rendered; this also covers the
+      // no-cache-yet case, where `loading` is still true until this
+      // finishes).
+      await loadFreshAndCache();
+    };
+
+    load();
 
     return () => {
       cancelled = true;
@@ -253,20 +331,16 @@ function ActivityHeatmap({
     );
   }
 
-  // Stats are computed from ALL merged activity (not year-filtered) so
-  // "Current Streak" stays correct even if the selected year is a past one.
   const { totalActiveDays, currentStreak, maxStreak } =
-    calculateStreaks(activityMap);
+    calculateStreaks(breakdownMap);
 
-  // Activity Points — a display-only score for the heatmap, deliberately
-  // NOT added to the profile's totalXP anywhere. Kept as a simple sum of
-  // raw daily counts so it never has to touch the XP formula.
-  const totalActivityPoints = Object.values(activityMap).reduce(
-    (sum, count) => sum + count,
+  // Activity Points — display-only score, never added to profile totalXP.
+  const totalActivityPoints = Object.values(breakdownMap).reduce(
+    (sum, b) => sum + totalForDay(b),
     0
   );
 
-  const yearDays = buildYearGrid(selectedYear, activityMap);
+  const yearDays = buildYearGrid(selectedYear, breakdownMap);
   const weeks = groupIntoWeeks(yearDays);
   const monthLabels = getMonthLabelPositions(weeks);
 
@@ -305,7 +379,6 @@ function ActivityHeatmap({
 
       <div className="mt-5 overflow-x-auto">
         <div className="inline-flex flex-col">
-          {/* Month labels row */}
           <div className="mb-1 flex gap-1 pl-0">
             {weeks.map((_, weekIndex) => (
               <div
@@ -317,7 +390,6 @@ function ActivityHeatmap({
             ))}
           </div>
 
-          {/* Weekly columns grid */}
           <div className="flex gap-1">
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-1">
@@ -325,9 +397,9 @@ function ActivityHeatmap({
                   day.inCurrentRange ? (
                     <div
                       key={day.date}
-                      title={`${day.date}: ${day.count} activity`}
+                      title={buildTooltip(day.date, day.breakdown)}
                       className={`h-3 w-3 flex-shrink-0 rounded-sm ${getIntensityClass(
-                        day.count
+                        totalForDay(day.breakdown)
                       )}`}
                     />
                   ) : (
