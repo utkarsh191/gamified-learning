@@ -43,6 +43,11 @@ interface GithubUser {
   [key: string]: any;
 }
 
+interface DailyCount {
+  date: string;
+  count: number;
+}
+
 interface GithubActivityResponse {
   username: string;
 
@@ -64,6 +69,10 @@ interface GithubActivityResponse {
   pullRequestReviewXP: number;
 
   totalGithubXP: number;
+
+  // NEW — per-day commit counts, used only by the Profile heatmap.
+  // Does not affect XP calculation in any way.
+  dailyCommits: DailyCount[];
 }
 
 const githubHeaders = () => ({
@@ -348,11 +357,10 @@ export const getGithubActivity = async (
       }
     }
 
-    // 2. Fetch ALL commits by this user across ALL public repos — unchanged.
-    // Uses the repo commits endpoint directly, not Search API, so it isn't
-    // subject to the 1000-result search cap — pagination alone covers a
-    // repo's full history, however many years it spans.
+    // 2. Fetch ALL commits by this user across ALL public repos — unchanged
+    // logic, PLUS (NEW) group commits by date for the heatmap.
     let totalCommits = 0;
+    const dailyCommitsMap: Record<string, number> = {};
 
     for (const repo of repos) {
       let commitPage = 1;
@@ -375,6 +383,17 @@ export const getGithubActivity = async (
         }
 
         totalCommits += commits.length;
+
+        // NEW — bucket each commit under its date for the heatmap.
+        // Purely additive; does not touch totalCommits/XP above.
+        for (const commit of commits) {
+          const authorDate = commit?.commit?.author?.date;
+          if (!authorDate) continue;
+
+          const dateStr = toDateOnly(new Date(authorDate));
+          dailyCommitsMap[dateStr] = (dailyCommitsMap[dateStr] ?? 0) + 1;
+        }
+
         commitPage++;
 
         if (commits.length < 100) {
@@ -430,6 +449,11 @@ export const getGithubActivity = async (
     const totalGithubXP =
       commitXP + pullRequestXP + mergedPullRequestXP + issueXP + pullRequestReviewXP;
 
+    // NEW — convert the map into a sorted array for the frontend heatmap
+    const dailyCommits: DailyCount[] = Object.entries(dailyCommitsMap)
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
     const responseBody: GithubActivityResponse = {
       username,
 
@@ -451,6 +475,8 @@ export const getGithubActivity = async (
       pullRequestReviewXP,
 
       totalGithubXP,
+
+      dailyCommits,
     };
 
     return res.status(200).json(responseBody);
