@@ -32,3 +32,43 @@ export const getActivity = async () => {
 
   return response.data;
 };
+
+// NEW — heatmap cache. Kept fully separate from XP endpoints in
+// profileService.ts.
+
+export interface DailyActivityEntry {
+  date: string;
+  githubCount: number;
+  leetcodeCount: number;
+}
+
+export const getHeatmapCache = async (): Promise<{
+  data: DailyActivityEntry[];
+  updatedAt: string | null;
+}> => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.get(`${API_URL}/heatmap`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
+
+export const saveHeatmapCache = async (data: DailyActivityEntry[]) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.put(
+    `${API_URL}/heatmap`,
+    { data },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data;
+};
