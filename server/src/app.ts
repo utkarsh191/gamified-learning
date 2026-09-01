@@ -5,6 +5,7 @@ import userRoutes from "./routes/userRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import githubRoutes from "./routes/githubRoutes.js";
 import leetcodeRoutes from "./routes/leetcodeRoutes.js";
+import activityRoutes from "./routes/activityRoutes.js"; // NEW
 
 const app = express();
 
@@ -28,5 +29,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/github", githubRoutes);
 app.use("/api/leetcode", leetcodeRoutes);
+app.use("/api/activity", activityRoutes); // NEW
 
 export default app;
