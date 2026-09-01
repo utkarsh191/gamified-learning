@@ -1,5 +1,5 @@
 import { Response } from "express";
-import User from "../models/User.js";
+import User, { IDailyActivityEntry } from "../models/User.js";
 import { AuthRequest } from "../middleware/authMiddleware.js";
 
 const toDateOnly = (d: Date): string => d.toISOString().slice(0, 10);
@@ -53,7 +53,6 @@ export const pingActivity = async (req: AuthRequest, res: Response) => {
     const todayStr = toDateOnly(new Date());
 
     if (user.activityDates.includes(todayStr)) {
-      // Already marked active today — no-op, just return current stats.
       return res.status(200).json({
         message: "Already active today",
         activityDates: user.activityDates,
@@ -87,8 +86,7 @@ export const pingActivity = async (req: AuthRequest, res: Response) => {
 };
 
 // GET /api/activity -> returns the logged-in user's app-own activity
-// stats (never GitHub/LeetCode data). currentStreak is corrected for
-// display in case a day was missed since the last ping.
+// stats (never GitHub/LeetCode data).
 export const getActivity = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -119,5 +117,102 @@ export const getActivity = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     console.error("Get activity error:", error);
     return res.status(500).json({ message: "Failed to fetch activity" });
+  }
+};
+
+// ---------------------------------------------------------------------
+// NEW — Heatmap cache endpoints. Completely separate from githubXP /
+// leetcodeXP / totalXP: this cache only ever feeds the heatmap grid and
+// its tooltip, never the Profile XP numbers.
+// ---------------------------------------------------------------------
+
+// GET /api/activity/heatmap -> returns the last saved per-day
+// GitHub+LeetCode activity cache, so the Profile page can render the
+// heatmap instantly on load instead of waiting on live GitHub/LeetCode
+// fetches every time.
+export const getHeatmapCache = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const user = await User.findById(userId).select(
+      "codingActivityCache codingActivityCacheUpdatedAt"
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      data: user.codingActivityCache ?? [],
+      updatedAt: user.codingActivityCacheUpdatedAt ?? null,
+    });
+  } catch (error) {
+    console.error("Get heatmap cache error:", error);
+    return res.status(500).json({ message: "Failed to fetch heatmap cache" });
+  }
+};
+
+// PUT /api/activity/heatmap -> overwrites the cached per-day activity with
+// freshly fetched GitHub+LeetCode data. Called by the frontend after it
+// fetches live data, so the NEXT page load can read from cache instead of
+// hitting GitHub/LeetCode again.
+export const saveHeatmapCache = async (req: AuthRequest, res: Response) => {
+  try {
+    const userId = req.user?.userId;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const incoming = req.body.data;
+
+    if (!Array.isArray(incoming)) {
+      return res.status(400).json({ message: "data must be an array" });
+    }
+
+    // Basic shape validation — reject anything that isn't a proper
+    // {date, githubCount, leetcodeCount} entry rather than trusting the
+    // client blindly.
+    const sanitized: IDailyActivityEntry[] = incoming
+      .filter(
+        (entry) =>
+          entry &&
+          typeof entry.date === "string" &&
+          typeof entry.githubCount === "number" &&
+          typeof entry.leetcodeCount === "number"
+      )
+      .map((entry) => ({
+        date: entry.date,
+        githubCount: entry.githubCount,
+        leetcodeCount: entry.leetcodeCount,
+      }));
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        $set: {
+          codingActivityCache: sanitized,
+          codingActivityCacheUpdatedAt: new Date(),
+        },
+      },
+      { new: true, runValidators: true }
+    ).select("codingActivityCache codingActivityCacheUpdatedAt");
+
+    if (!updatedUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.status(200).json({
+      message: "Heatmap cache updated",
+      data: updatedUser.codingActivityCache,
+      updatedAt: updatedUser.codingActivityCacheUpdatedAt,
+    });
+  } catch (error) {
+    console.error("Save heatmap cache error:", error);
+    return res.status(500).json({ message: "Failed to save heatmap cache" });
   }
 };
