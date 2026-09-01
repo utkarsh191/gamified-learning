@@ -383,7 +383,7 @@ function ActivityHeatmap({
             {weeks.map((_, weekIndex) => (
               <div
                 key={weekIndex}
-                className="w-3 flex-shrink-0 text-[10px] text-gray-400"
+                className="w-3 shrink-0 text-[10px] text-gray-400"
               >
                 {monthLabels[weekIndex] ?? ""}
               </div>
@@ -398,14 +398,14 @@ function ActivityHeatmap({
                     <div
                       key={day.date}
                       title={buildTooltip(day.date, day.breakdown)}
-                      className={`h-3 w-3 flex-shrink-0 rounded-sm ${getIntensityClass(
+                      className={`h-3 w-3 shrink-0 rounded-sm ${getIntensityClass(
                         totalForDay(day.breakdown)
                       )}`}
                     />
                   ) : (
                     <div
                       key={`pad-${weekIndex}-${dayIndex}`}
-                      className="h-3 w-3 flex-shrink-0"
+                      className="h-3 w-3 shrink-0"
                     />
                   )
                 )}
