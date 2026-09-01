@@ -99,7 +99,7 @@ function EditProfile() {
       </div>
     );
   }
-
+  
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
       <div className="mx-auto max-w-4xl">
@@ -163,7 +163,7 @@ function EditProfile() {
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value="">
-                  Add your college
+                  Select your college
                 </option>
 
                 {colleges.map((collegeName) => (
