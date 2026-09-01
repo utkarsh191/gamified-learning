@@ -1,6 +1,17 @@
+import { useEffect } from "react";
 import { Link } from "react-router-dom";
+import { pingActivity } from "../services/activityService"; // NEW
 
 function Dashboard() {
+  // NEW — marks today as an active day for the app's own streak.
+  // Fire-and-forget: doesn't block rendering, and the backend is
+  // idempotent, so this being called on every Dashboard mount is safe.
+  useEffect(() => {
+    pingActivity().catch((error) => {
+      console.error("Failed to ping activity:", error);
+    });
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
 
