@@ -73,10 +73,18 @@ function Profile() {
                 @{user.username}
               </p>
 
-              <p className="mt-4 text-gray-300">
-                B.Tech IT Student with strong interest in Data Structures
-                and Algorithms.
-              </p>
+              {user.readMe ? (
+               <p className="mt-4 text-gray-300">
+               {user.readMe}
+                </p>
+                 ) : (
+                <Link
+                to="/edit-profile"
+                className="mt-4 block text-blue-400 hover:text-blue-300"
+                >
+                ✏️ Add something about yourself
+                </Link>
+              )}
 
               {/* College */}
               {user.college ? (
