@@ -13,3 +13,15 @@ export const getProfile = async () => {
 
   return response.data;
 };
+
+export const updateProfile = async (profileData: any) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.put(API_URL, profileData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};

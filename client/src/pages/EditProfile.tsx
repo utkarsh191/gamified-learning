@@ -1,73 +1,104 @@
 import { useEffect, useState } from "react";
-import { getProfile } from "../services/profileService";
+import { useNavigate } from "react-router-dom";
+import { getProfile, updateProfile } from "../services/profileService";
 import { colleges } from "../data/colleges";
 
-  function EditProfile() {
- const [displayName, setDisplayName] = useState("");
-const [location, setLocation] = useState("");
-const [githubUsername, setGithubUsername] = useState("");
-const [linkedinUsername, setLinkedinUsername] = useState("");
-const [leetcodeUsername, setLeetcodeUsername] = useState("");
-const [xUsername, setXUsername] = useState("");
-const [readMe, setReadMe] = useState("");
-const [workExperience, setWorkExperience] = useState("");
-const [education, setEducation] = useState("");
-const [skills, setSkills] = useState("");
-const [currentLearning, setCurrentLearning] = useState("");
-const [interests, setInterests] = useState("");
-const [learningGoals, setLearningGoals] = useState("");
-const [college, setCollege] = useState("");
 
-useEffect(() => {
-  const fetchProfile = async () => {
+function EditProfile() {
+  const navigate = useNavigate();
+
+  const [displayName, setDisplayName] = useState("");
+  const [college, setCollege] = useState("");
+  const [location, setLocation] = useState("");
+  const [githubUsername, setGithubUsername] = useState("");
+  const [linkedinUsername, setLinkedinUsername] = useState("");
+  const [leetcodeUsername, setLeetcodeUsername] = useState("");
+  const [xUsername, setXUsername] = useState("");
+  const [readMe, setReadMe] = useState("");
+  const [workExperience, setWorkExperience] = useState("");
+  const [education, setEducation] = useState("");
+  const [skills, setSkills] = useState("");
+  const [currentLearning, setCurrentLearning] = useState("");
+  const [interests, setInterests] = useState("");
+  const [learningGoals, setLearningGoals] = useState("");
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  // Load existing profile data
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfile();
+
+        const user = data.user;
+
+        setDisplayName(user.name || "");
+        setCollege(user.college || "");
+        setLocation(user.location || "");
+        setGithubUsername(user.githubUsername || "");
+        setLinkedinUsername(user.linkedinUsername || "");
+        setLeetcodeUsername(user.leetcodeUsername || "");
+        setXUsername(user.xUsername || "");
+        setReadMe(user.readMe || "");
+        setWorkExperience(user.workExperience || "");
+        setEducation(user.education || "");
+        setSkills(user.skills || "");
+        setCurrentLearning(user.currentLearning || "");
+        setInterests(user.interests || "");
+        setLearningGoals(user.learningGoals || "");
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
+  // Save profile
+  const handleSave = async () => {
     try {
-      const data = await getProfile();
+      setSaving(true);
 
-      setDisplayName(data.user.name);
-      setCollege(data.user.college || "");
+      const profileData = {
+        name: displayName,
+        college,
+        location,
+        githubUsername,
+        linkedinUsername,
+        leetcodeUsername,
+        xUsername,
+        readMe,
+        workExperience,
+        education,
+        skills,
+        currentLearning,
+        interests,
+        learningGoals,
+      };
+
+    const data = await updateProfile(profileData);
+
+      console.log("Profile updated:", data);
+
+      // Save successful → Profile page
+      navigate("/profile");
     } catch (error) {
-      console.error("Failed to fetch profile:", error);
+      console.error("Failed to save profile:", error);
+    } finally {
+      setSaving(false);
     }
   };
 
-  fetchProfile();
-}, []);
-
-
-const handleSave = async () => {
-  const profileData = {
-    name: displayName,
-    college,
-    location,
-    githubUsername,
-    linkedinUsername,
-    leetcodeUsername,
-    xUsername,
-    readMe,
-    workExperience,
-    education,
-    skills,
-    currentLearning,
-    interests,
-    learningGoals,
-  };
-
-  try {
-  const response = await fetch("http://localhost:5000/api/profile", {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(profileData),
-  });
-
-  const data = await response.json();
-
-  console.log(data);
-} catch (error) {
-  console.error("Failed to save profile:", error);
-}
-};
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-900 p-8 text-white">
+        Loading profile...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
@@ -105,10 +136,10 @@ const handleSave = async () => {
 
           <div className="mt-5 space-y-5">
 
-            {/* Display Name */}
+            {/* Name */}
             <div>
               <label className="mb-2 block font-semibold">
-                 Name
+                Name
               </label>
 
               <input
@@ -120,25 +151,31 @@ const handleSave = async () => {
               />
             </div>
 
-            {/* College name */}
-            <div className="mt-4">
-              <label className="block text-white mb-2">
+            {/* College */}
+            <div>
+              <label className="mb-2 block font-semibold">
                 College
               </label>
-              <select 
+
+              <select
                 value={college}
                 onChange={(e) => setCollege(e.target.value)}
-                className="w-full px-4 py-3 rounded-lg bg-gray-800 text-white border border-gray-700 outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
               >
-                 <option value="">Add your college</option>
-                 {colleges.map((collegeName) => (
-                   <option key={collegeName} value={collegeName}>
-                     {collegeName}
-                   </option>
-                 ))}
+                <option value="">
+                  Add your college
+                </option>
+
+                {colleges.map((collegeName) => (
+                  <option
+                    key={collegeName}
+                    value={collegeName}
+                  >
+                    {collegeName}
+                  </option>
+                ))}
               </select>
             </div>
-
 
             {/* Location */}
             <div>
@@ -251,13 +288,13 @@ const handleSave = async () => {
                 Work
               </label>
 
-             <textarea
-  rows={6}
-  placeholder="Write about your work experience..."
-  value={workExperience}
-  onChange={(e) => setWorkExperience(e.target.value)}
-  className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
-/>
+              <textarea
+                rows={6}
+                placeholder="Write about your work experience..."
+                value={workExperience}
+                onChange={(e) => setWorkExperience(e.target.value)}
+                className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+              />
             </div>
 
             {/* Education */}
@@ -314,8 +351,8 @@ const handleSave = async () => {
               <input
                 type="text"
                 placeholder="What are you currently learning?"
-                  value={currentLearning}
-                onChange={(e) => setCurrentLearning(e.target.value)} 
+                value={currentLearning}
+                onChange={(e) => setCurrentLearning(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
             </div>
@@ -329,7 +366,7 @@ const handleSave = async () => {
               <input
                 type="text"
                 placeholder="Enter your interests"
-                  value={interests}
+                value={interests}
                 onChange={(e) => setInterests(e.target.value)}
                 className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
               />
@@ -427,9 +464,10 @@ const handleSave = async () => {
           <button
             type="button"
             onClick={handleSave}
-            className="rounded-lg bg-blue-600 px-8 py-3 font-semibold transition hover:bg-blue-700"
+            disabled={saving}
+            className="rounded-lg bg-blue-600 px-8 py-3 font-semibold transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Save Changes
+            {saving ? "Saving..." : "Save Changes"}
           </button>
         </div>
 

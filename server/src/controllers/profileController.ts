@@ -1,39 +1,23 @@
 import User from "../models/User.js";
-
 import { Request, Response } from "express";
-
 import { AuthRequest } from "../middleware/authMiddleware.js";
 
 export const updateProfile = async (
   req: AuthRequest,
   res: Response
 ) => {
-  const userId = req.user?.userId;
+  try {
+    const userId = req.user?.userId;
 
-  const {
-    name,
-    location,
-    githubUsername,
-    linkedinUsername,
-    leetcodeUsername,
-    xUsername,
-    readMe,
-    workExperience,
-    education,
-    skills,
-    currentLearning,
-    interests,
-    learningGoals,
-  } = req.body;
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized",
+      });
+    }
 
-  console.log("User ID:", userId);
-
-  console.log("Profile Data:", req.body);
-
-  const updatedUser = await User.findByIdAndUpdate(
-    userId,
-    {
+    const {
       name,
+      college,
       location,
       githubUsername,
       linkedinUsername,
@@ -46,19 +30,49 @@ export const updateProfile = async (
       currentLearning,
       interests,
       learningGoals,
-    },
-    { new: true }
-  );
-  if (!updatedUser) {
-  return res.status(404).json({
-    message: "User not found",
-  });
-}
+    } = req.body;
 
-return res.status(200).json({
-  message: "Profile updated successfully",
-  user: updatedUser,
-});
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      {
+        name,
+        college,
+        location,
+        githubUsername,
+        linkedinUsername,
+        leetcodeUsername,
+        xUsername,
+        readMe,
+        workExperience,
+        education,
+        skills,
+        currentLearning,
+        interests,
+        learningGoals,
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("Update profile error:", error);
+
+    return res.status(500).json({
+      message: "Failed to update profile",
+    });
+  }
 };
 
 export const getProfileByUsername = async (
