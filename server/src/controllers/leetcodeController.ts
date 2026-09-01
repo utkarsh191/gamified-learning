@@ -10,8 +10,18 @@ interface LeetCodeResponse {
           count: number;
         }[];
       };
+      // NEW — daily submission counts, keyed by unix timestamp (seconds)
+      // as a JSON string. LeetCode's own public field for this.
+      userCalendar: {
+        submissionCalendar: string;
+      };
     } | null;
   };
+}
+
+interface DailyCount {
+  date: string;
+  count: number;
 }
 
 const LEETCODE_GRAPHQL_URL = "https://leetcode.com/graphql";
@@ -21,6 +31,29 @@ const XP_RULES = {
   MEDIUM: 20,
   HARD: 40,
 } as const;
+
+const toDateOnly = (d: Date): string => d.toISOString().slice(0, 10);
+
+// NEW — parses LeetCode's submissionCalendar ("timestamp": count JSON
+// string, seconds since epoch) into a sorted array of {date, count}.
+// Used only by the heatmap; has no effect on XP calculation below.
+const parseSubmissionCalendar = (raw: string | undefined): DailyCount[] => {
+  if (!raw) return [];
+
+  try {
+    const parsed: Record<string, number> = JSON.parse(raw);
+
+    return Object.entries(parsed)
+      .map(([timestampSeconds, count]) => ({
+        date: toDateOnly(new Date(Number(timestampSeconds) * 1000)),
+        count,
+      }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+  } catch (error) {
+    console.error("Failed to parse LeetCode submissionCalendar:", error);
+    return [];
+  }
+};
 
 export const getLeetcodeActivity = async (
   req: Request<{ username: string }>,
@@ -44,6 +77,9 @@ export const getLeetcodeActivity = async (
               difficulty
               count
             }
+          }
+          userCalendar {
+            submissionCalendar
           }
         }
       }
@@ -92,12 +128,17 @@ export const getLeetcodeActivity = async (
 
     const totalSolved = easySolved + mediumSolved + hardSolved;
 
-    // XP calculation
+    // XP calculation — unchanged
     const easyXP = easySolved * XP_RULES.EASY;
     const mediumXP = mediumSolved * XP_RULES.MEDIUM;
     const hardXP = hardSolved * XP_RULES.HARD;
 
     const totalLeetcodeXP = easyXP + mediumXP + hardXP;
+
+    // NEW — daily submissions for the heatmap only
+    const dailySubmissions = parseSubmissionCalendar(
+      user.userCalendar?.submissionCalendar
+    );
 
     return res.status(200).json({
       username,
@@ -114,6 +155,8 @@ export const getLeetcodeActivity = async (
       hardXP,
 
       totalLeetcodeXP,
+
+      dailySubmissions,
     });
   } catch (error) {
     console.error("LeetCode activity error:", error);
