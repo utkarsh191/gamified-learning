@@ -25,3 +25,22 @@ export const updateProfile = async (profileData: any) => {
 
   return response.data;
 };
+
+// Persists the latest calculated GitHub/LeetCode XP so the next Profile
+// load can show it instantly, without waiting on external APIs.
+export const updateCachedXP = async (xpData: {
+  githubXP?: number;
+  leetcodeXP?: number;
+  totalXP?: number;
+  leetcodeTotalSolved?: number;
+}) => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.patch(`${API_URL}/xp`, xpData, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  return response.data;
+};
