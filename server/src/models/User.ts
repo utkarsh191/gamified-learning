@@ -24,6 +24,14 @@ export interface IUser extends Document {
   totalXP?: number;
   leetcodeTotalSolved?: number;
 
+  // App's OWN activity streak — completely separate from GitHub/LeetCode.
+  // activityDates holds one "YYYY-MM-DD" entry per calendar day the user
+  // was active on THIS app (never GitHub/LeetCode data).
+  activityDates: string[];
+  currentStreak: number;
+  maxStreak: number;
+  totalActiveDays: number;
+
   email: string;
   password: string;
   role: "student" | "admin";
@@ -128,6 +136,27 @@ const userSchema = new Schema<IUser>(
     },
 
     leetcodeTotalSolved: {
+      type: Number,
+      default: 0,
+    },
+
+    // App's own activity streak fields — NEW
+    activityDates: {
+      type: [String],
+      default: [],
+    },
+
+    currentStreak: {
+      type: Number,
+      default: 0,
+    },
+
+    maxStreak: {
+      type: Number,
+      default: 0,
+    },
+
+    totalActiveDays: {
       type: Number,
       default: 0,
     },
