@@ -9,7 +9,7 @@ function Profile() {
   const [githubXP, setGithubXP] = useState(0);
   const [leetcodeXP, setLeetcodeXP] = useState(0);
   const [totalSolved, setTotalSolved] = useState(0);
-
+ 
   const [refreshingGithub, setRefreshingGithub] = useState(false);
   const [refreshingLeetcode, setRefreshingLeetcode] = useState(false);
 
