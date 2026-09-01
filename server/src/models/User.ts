@@ -1,5 +1,11 @@
 import mongoose, { Document, Schema } from "mongoose";
 
+export interface IDailyActivityEntry {
+  date: string;
+  githubCount: number;
+  leetcodeCount: number;
+}
+
 export interface IUser extends Document {
   name: string;
   username: string;
@@ -25,12 +31,17 @@ export interface IUser extends Document {
   leetcodeTotalSolved?: number;
 
   // App's OWN activity streak — completely separate from GitHub/LeetCode.
-  // activityDates holds one "YYYY-MM-DD" entry per calendar day the user
-  // was active on THIS app (never GitHub/LeetCode data).
   activityDates: string[];
   currentStreak: number;
   maxStreak: number;
   totalActiveDays: number;
+
+  // NEW — cached heatmap data (per-day GitHub commit count + LeetCode
+  // submission count). Kept completely separate from githubXP/leetcodeXP/
+  // totalXP above — this cache is ONLY read to render the heatmap fast on
+  // reload, it is never summed into the XP fields.
+  codingActivityCache: IDailyActivityEntry[];
+  codingActivityCacheUpdatedAt?: Date;
 
   email: string;
   password: string;
@@ -118,8 +129,8 @@ const userSchema = new Schema<IUser>(
       trim: true,
     },
 
-    // Cached XP fields — default 0 so a brand-new user renders "0" instead
-    // of undefined/NaN before their first GitHub/LeetCode fetch completes.
+    // Cached XP fields — untouched, still the single source of truth for
+    // Profile page's Total XP display.
     githubXP: {
       type: Number,
       default: 0,
@@ -140,7 +151,7 @@ const userSchema = new Schema<IUser>(
       default: 0,
     },
 
-    // App's own activity streak fields — NEW
+    // App's own activity streak fields — untouched
     activityDates: {
       type: [String],
       default: [],
@@ -159,6 +170,23 @@ const userSchema = new Schema<IUser>(
     totalActiveDays: {
       type: Number,
       default: 0,
+    },
+
+    // NEW — heatmap cache. Plain subdocument array, no separate model
+    // needed since it's always read/written as a whole per user.
+    codingActivityCache: {
+      type: [
+        {
+          date: { type: String, required: true },
+          githubCount: { type: Number, default: 0 },
+          leetcodeCount: { type: Number, default: 0 },
+        },
+      ],
+      default: [],
+    },
+
+    codingActivityCacheUpdatedAt: {
+      type: Date,
     },
 
     email: {
