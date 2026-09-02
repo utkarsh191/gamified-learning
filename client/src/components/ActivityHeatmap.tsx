@@ -289,27 +289,27 @@ function ActivityHeatmap({
     };
 
     const load = async () => {
-      if (!githubUsername && !leetcodeUsername) {
-        setLoading(false);
-        return;
-      }
-
-      // Step 1 — try the cache first for an instant render.
+      // Always read the cache first — even with NO usernames connected.
+      // This is what makes a reset (username removed -> cache zeroed on
+      // the backend) show up correctly as a blank grid immediately,
+      // instead of showing stale data or nothing.
       try {
         const cached = await getHeatmapCache();
-        if (!cancelled && cached.data && cached.data.length > 0) {
-          setBreakdownMap(toBreakdownMap(cached.data));
-          setLoading(false); // heatmap can render now
+        if (!cancelled) {
+          setBreakdownMap(toBreakdownMap(cached.data ?? []));
+          setLoading(false); // heatmap can render now, even if all zeros
         }
       } catch (error) {
         console.error("Failed to load heatmap cache:", error);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
 
-      // Step 2 — always refresh from GitHub/LeetCode in the background
-      // (silent if cache already rendered; this also covers the
-      // no-cache-yet case, where `loading` is still true until this
-      // finishes).
-      await loadFreshAndCache();
+      // Only hit GitHub/LeetCode if at least one is actually connected.
+      if (githubUsername || leetcodeUsername) {
+        await loadFreshAndCache();
+      }
     };
 
     load();
@@ -318,10 +318,6 @@ function ActivityHeatmap({
       cancelled = true;
     };
   }, [githubUsername, leetcodeUsername]);
-
-  if (!githubUsername && !leetcodeUsername) {
-    return null;
-  }
 
   if (loading) {
     return (
