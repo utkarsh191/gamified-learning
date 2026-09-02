@@ -1,5 +1,5 @@
 import axios from "axios";
-import { Message } from "../types/message";
+import type { Message } from "../types/message";
 
 const API_URL = "http://localhost:5000/api/messages";
 

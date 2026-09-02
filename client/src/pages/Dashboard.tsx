@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { pingActivity } from "../services/activityService"; // NEW
 import { getMessages, sendMessage } from "../services/messageService";
-import { Message } from "../types/message";
+import type { Message } from "../types/message";
 
 function Dashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
