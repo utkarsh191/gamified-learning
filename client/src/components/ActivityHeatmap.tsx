@@ -4,8 +4,8 @@ import { getLeetcodeActivity } from "../services/leetcodeService";
 import {
   getHeatmapCache,
   saveHeatmapCache,
-  DailyActivityEntry,
 } from "../services/activityService";
+import type { DailyActivityEntry } from "../services/activityService";
 
 interface ActivityHeatmapProps {
   githubUsername?: string;
