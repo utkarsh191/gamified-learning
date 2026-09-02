@@ -212,6 +212,31 @@ const toEntryArray = (
     leetcodeCount: b.leetcodeCount,
   }));
 
+// Defensive mask — regardless of what the cache or a fresh fetch contains,
+// a source whose username is CURRENTLY empty must never show non-zero
+// counts. This is what guarantees old green dots can never resurface from
+// a stale cache, a race condition, or a partial backend write — the
+// frontend enforces the rule itself instead of trusting the source data.
+const maskByCurrentUsernames = (
+  breakdownMap: Record<string, DayBreakdown>,
+  githubUsername: string | undefined,
+  leetcodeUsername: string | undefined
+): Record<string, DayBreakdown> => {
+  const hasGithub = !!githubUsername;
+  const hasLeetcode = !!leetcodeUsername;
+
+  const masked: Record<string, DayBreakdown> = {};
+
+  for (const [date, breakdown] of Object.entries(breakdownMap)) {
+    masked[date] = {
+      githubCount: hasGithub ? breakdown.githubCount : 0,
+      leetcodeCount: hasLeetcode ? breakdown.leetcodeCount : 0,
+    };
+  }
+
+  return masked;
+};
+
 function ActivityHeatmap({
   githubUsername,
   leetcodeUsername,
@@ -279,8 +304,13 @@ function ActivityHeatmap({
       // actually fetched (avoids wiping a good cache with an empty result
       // when GitHub/LeetCode both fail, e.g. rate limit).
       if (Object.keys(merged).length > 0) {
-        setBreakdownMap(merged);
-        saveHeatmapCache(toEntryArray(merged)).catch((error) => {
+        const maskedMerged = maskByCurrentUsernames(
+          merged,
+          githubUsername,
+          leetcodeUsername
+        );
+        setBreakdownMap(maskedMerged);
+        saveHeatmapCache(toEntryArray(maskedMerged)).catch((error) => {
           console.error("Failed to save heatmap cache:", error);
         });
       }
@@ -290,13 +320,18 @@ function ActivityHeatmap({
 
     const load = async () => {
       // Always read the cache first — even with NO usernames connected.
-      // This is what makes a reset (username removed -> cache zeroed on
-      // the backend) show up correctly as a blank grid immediately,
-      // instead of showing stale data or nothing.
+      // Whatever comes back is immediately masked against the CURRENT
+      // usernames below, so a stale/partial cache can never leak old
+      // green dots for a source that's no longer connected.
       try {
         const cached = await getHeatmapCache();
         if (!cancelled) {
-          setBreakdownMap(toBreakdownMap(cached.data ?? []));
+          const maskedCached = maskByCurrentUsernames(
+            toBreakdownMap(cached.data ?? []),
+            githubUsername,
+            leetcodeUsername
+          );
+          setBreakdownMap(maskedCached);
           setLoading(false); // heatmap can render now, even if all zeros
         }
       } catch (error) {
