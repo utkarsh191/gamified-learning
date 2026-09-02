@@ -2,7 +2,8 @@ import { Response } from "express";
 import Message from "../models/Message.js";
 import { AuthRequest } from "../middleware/authMiddleware.js";
 
-// GET /api/messages -> returns the logged-in user's messages, latest first
+// GET /api/messages -> returns the logged-in user's messages, latest first,
+// with sender's name/username populated for display
 export const getMessages = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -11,9 +12,9 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const messages = await Message.find({ user: userId }).sort({
-      createdAt: -1,
-    });
+    const messages = await Message.find({ user: userId })
+      .sort({ createdAt: -1 })
+      .populate("user", "name username");
 
     return res.status(200).json({ messages });
   } catch (error) {
@@ -22,7 +23,9 @@ export const getMessages = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// POST /api/messages -> creates a new message for the logged-in user
+// POST /api/messages -> creates a new message for the logged-in user,
+// returns it with sender's name/username populated so the UI can show
+// it immediately without a refetch
 export const createMessage = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -41,6 +44,8 @@ export const createMessage = async (req: AuthRequest, res: Response) => {
       user: userId,
       text: text.trim(),
     });
+
+    await newMessage.populate("user", "name username");
 
     return res.status(201).json({ message: newMessage });
   } catch (error) {

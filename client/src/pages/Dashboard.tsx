@@ -23,7 +23,7 @@ function Dashboard() {
   }, []);
 
   // Load this user's previous messages from the DB on mount
-  // (backend already returns them newest first).
+  // (backend already returns them newest first, with sender populated).
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -143,9 +143,16 @@ function Dashboard() {
                 className="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 text-white"
               >
                 <p>{msg.text}</p>
-                <p className="text-gray-500 text-xs mt-1">
-                  {new Date(msg.createdAt).toLocaleString()}
-                </p>
+
+                <div className="flex items-center justify-between mt-1">
+                  <p className="text-gray-500 text-xs">
+                    {new Date(msg.createdAt).toLocaleString()}
+                  </p>
+
+                  <p className="text-gray-400 text-xs font-medium">
+                    {msg.user?.name || msg.user?.username || "Unknown"}
+                  </p>
+                </div>
               </div>
             ))}
 
