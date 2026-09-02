@@ -51,7 +51,12 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// PUT /api/profile -> safely updates only the profile fields that were sent
+// PUT /api/profile -> safely updates only the profile fields that were sent.
+// ALSO — if this update removes a previously-set GitHub or LeetCode
+// username, resets that source's cached XP and zeroes out its side of the
+// coding-activity heatmap cache in the SAME write. This is what makes
+// "remove username -> Save Changes" immediately zero the right numbers
+// and persist that reset in MongoDB, without a second API call.
 export const updateProfile = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
@@ -60,12 +65,64 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
+    const existingUser = await User.findById(userId);
+
+    if (!existingUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     const update: Record<string, unknown> = {};
 
     for (const field of PROFILE_FIELDS) {
       if (req.body[field] !== undefined) {
         update[field] = req.body[field];
       }
+    }
+
+    const newGithubUsername = update.githubUsername as string | undefined;
+    const newLeetcodeUsername = update.leetcodeUsername as string | undefined;
+
+    // "Removed" = this update explicitly sends a blank value AND the user
+    // previously had a real value set. A field simply not being sent at
+    // all is never treated as a removal.
+    const githubRemoved =
+      newGithubUsername !== undefined &&
+      !newGithubUsername.trim() &&
+      !!existingUser.githubUsername;
+
+    const leetcodeRemoved =
+      newLeetcodeUsername !== undefined &&
+      !newLeetcodeUsername.trim() &&
+      !!existingUser.leetcodeUsername;
+
+    if (githubRemoved) {
+      update.githubXP = 0;
+    }
+
+    if (leetcodeRemoved) {
+      update.leetcodeXP = 0;
+      update.leetcodeTotalSolved = 0;
+    }
+
+    if (githubRemoved || leetcodeRemoved) {
+      const resultingGithubXP = githubRemoved ? 0 : existingUser.githubXP ?? 0;
+      const resultingLeetcodeXP = leetcodeRemoved
+        ? 0
+        : existingUser.leetcodeXP ?? 0;
+
+      update.totalXP = resultingGithubXP + resultingLeetcodeXP;
+
+      // Zero out only the removed source's per-day counts — keep the
+      // other source's dots intact if it's still connected. Grid
+      // structure (dates) stays exactly as it was; only counts change.
+      update.codingActivityCache = existingUser.codingActivityCache.map(
+        (entry) => ({
+          date: entry.date,
+          githubCount: githubRemoved ? 0 : entry.githubCount,
+          leetcodeCount: leetcodeRemoved ? 0 : entry.leetcodeCount,
+        })
+      );
+      update.codingActivityCacheUpdatedAt = new Date();
     }
 
     const updatedUser = await User.findByIdAndUpdate(
