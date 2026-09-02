@@ -31,13 +31,47 @@ function Profile() {
         const fetchedUser = data.user;
         setUser(fetchedUser);
 
-        const cachedGithubXP = fetchedUser.githubXP ?? 0;
-        const cachedLeetcodeXP = fetchedUser.leetcodeXP ?? 0;
-        const cachedTotalSolved = fetchedUser.leetcodeTotalSolved ?? 0;
+        const hasGithub = !!fetchedUser.githubUsername;
+        const hasLeetcode = !!fetchedUser.leetcodeUsername;
+
+        // Defensive mask — same rule as ActivityHeatmap: a source whose
+        // username is CURRENTLY empty must never display non-zero cached
+        // numbers, no matter what the backend returns. This guarantees
+        // "8239 points after removing username" can never happen again,
+        // even if the DB write timing ever slips.
+        const cachedGithubXP = hasGithub ? fetchedUser.githubXP ?? 0 : 0;
+        const cachedLeetcodeXP = hasLeetcode ? fetchedUser.leetcodeXP ?? 0 : 0;
+        const cachedTotalSolved = hasLeetcode
+          ? fetchedUser.leetcodeTotalSolved ?? 0
+          : 0;
 
         setGithubXP(cachedGithubXP);
         setLeetcodeXP(cachedLeetcodeXP);
         setTotalSolved(cachedTotalSolved);
+
+        // If the raw backend value didn't actually match the masked
+        // (correct) value, the DB is out of sync — persist the correction
+        // now so refresh / logout-login never show the stale number again.
+        // This never touches XP CALCULATION rules, only the reset path.
+        const rawGithubXP = fetchedUser.githubXP ?? 0;
+        const rawLeetcodeXP = fetchedUser.leetcodeXP ?? 0;
+        const rawTotalSolved = fetchedUser.leetcodeTotalSolved ?? 0;
+
+        const needsDbCorrection =
+          rawGithubXP !== cachedGithubXP ||
+          rawLeetcodeXP !== cachedLeetcodeXP ||
+          rawTotalSolved !== cachedTotalSolved;
+
+        if (needsDbCorrection) {
+          updateCachedXP({
+            githubXP: cachedGithubXP,
+            leetcodeXP: cachedLeetcodeXP,
+            totalXP: cachedGithubXP + cachedLeetcodeXP,
+            leetcodeTotalSolved: cachedTotalSolved,
+          }).catch((error) => {
+            console.error("Failed to persist XP reset correction:", error);
+          });
+        }
 
         let freshGithubXP = cachedGithubXP;
         let freshLeetcodeXP = cachedLeetcodeXP;
@@ -46,8 +80,8 @@ function Profile() {
 
         const tasks: Promise<void>[] = [];
 
-        // GitHub XP
-        if (fetchedUser.githubUsername) {
+        // GitHub XP — only refetch if a GitHub username is actually set
+        if (hasGithub) {
           setRefreshingGithub(true);
 
           tasks.push(
@@ -77,8 +111,8 @@ function Profile() {
           );
         }
 
-        // LeetCode XP
-        if (fetchedUser.leetcodeUsername) {
+        // LeetCode XP — only refetch if a LeetCode username is actually set
+        if (hasLeetcode) {
           setRefreshingLeetcode(true);
 
           tasks.push(
@@ -113,7 +147,9 @@ function Profile() {
           );
         }
 
-        // App activity / streak
+        // App activity / streak — completely separate system, always
+        // fetched regardless of GitHub/LeetCode usernames, never reset
+        // by them.
         tasks.push(
           getActivity()
             .then((activityData) => {
@@ -131,7 +167,8 @@ function Profile() {
 
         await Promise.allSettled(tasks);
 
-        // Save updated XP cache
+        // Save updated XP cache if a live GitHub/LeetCode refetch changed
+        // anything (unrelated to the reset-correction write above).
         if (!cancelled && changed) {
           updateCachedXP({
             githubXP: freshGithubXP,
@@ -322,7 +359,8 @@ function Profile() {
             </p>
           </div>
 
-          {/* Current Streak */}
+          {/* Current Streak — app's own activity system, intentionally
+              separate from GitHub/LeetCode reset */}
           <div className="rounded-xl bg-gray-800 p-5 text-center">
             <p className="text-2xl">🔥</p>
 
