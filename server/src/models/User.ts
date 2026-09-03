@@ -46,6 +46,14 @@ export interface IUser extends Document {
   email: string;
   password: string;
   role: "student" | "admin";
+
+  // NEW — Forgot Password flow. resetPasswordToken stores a SHA-256 hash
+  // of the raw token emailed to the user (the raw token itself is never
+  // persisted anywhere). resetPasswordExpires enforces the time limit.
+  // Both are cleared immediately after a successful reset or a failed
+  // email-send attempt.
+  resetPasswordToken?: string;
+  resetPasswordExpires?: Date;
 }
 
 const userSchema = new Schema<IUser>(
@@ -207,6 +215,16 @@ const userSchema = new Schema<IUser>(
       type: String,
       enum: ["student", "admin"],
       default: "student",
+    },
+
+    // NEW — Forgot Password fields. Not required, no default; only ever
+    // populated while a reset is pending, cleared right after.
+    resetPasswordToken: {
+      type: String,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
     },
   },
   {

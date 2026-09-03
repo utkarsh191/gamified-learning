@@ -56,6 +56,10 @@ const resolveLinkedinUsername = (
   return { valid: true, username: trimmed };
 };
 
+// Fields never returned in a profile response — password hash AND the
+// forgot-password reset token/expiry, which are just as sensitive.
+const EXCLUDED_FIELDS = "-password -resetPasswordToken -resetPasswordExpires";
+
 // GET /api/profile -> returns the logged-in user's full profile (includes cached XP)
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
@@ -65,7 +69,7 @@ export const getProfile = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const user = await User.findById(userId).select("-password");
+    const user = await User.findById(userId).select(EXCLUDED_FIELDS);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
@@ -225,7 +229,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       userId,
       { $set: update },
       { new: true, runValidators: true }
-    ).select("-password");
+    ).select(EXCLUDED_FIELDS);
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -268,7 +272,7 @@ export const updateCachedXP = async (req: AuthRequest, res: Response) => {
       userId,
       { $set: update },
       { new: true, runValidators: true }
-    ).select("-password");
+    ).select(EXCLUDED_FIELDS);
 
     if (!updatedUser) {
       return res.status(404).json({ message: "User not found" });
@@ -288,7 +292,7 @@ export const getProfileByUsername = async (req: Request, res: Response) => {
   try {
     const { username } = req.params;
 
-    const user = await User.findOne({ username }).select("-password");
+    const user = await User.findOne({ username }).select(EXCLUDED_FIELDS);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });

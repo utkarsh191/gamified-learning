@@ -29,3 +29,19 @@ export const loginUser = async (
 
   return response.data;
 };
+
+export const forgotPassword = async (email: string) => {
+  const response = await axios.post(`${API_URL}/forgot-password`, {
+    email,
+  });
+
+  return response.data;
+};
+
+export const resetPassword = async (token: string, password: string) => {
+  const response = await axios.post(`${API_URL}/reset-password/${token}`, {
+    password,
+  });
+
+  return response.data;
+};
