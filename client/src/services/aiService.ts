@@ -20,3 +20,22 @@ export const sendChatMessage = async (
 
   return response.data.reply;
 };
+
+// "Analyze My Progress" — backend gathers the logged-in user's own data
+// from the DB (XP, streak, solved count, etc.) and asks Ollama for a
+// structured analysis. No user data is sent from the frontend.
+export const analyzeProgress = async (): Promise<ChatMessage> => {
+  const token = localStorage.getItem("token");
+
+  const response = await axios.post(
+    `${API_URL}/analyze`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+
+  return response.data.reply;
+};

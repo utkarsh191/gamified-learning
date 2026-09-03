@@ -1,24 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { sendChatMessage } from "../services/aiService";
+import { sendChatMessage, analyzeProgress } from "../services/aiService";
 import type { ChatMessage } from "../types/ai";
 
 function AiAssistant() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, sending]);
+  }, [messages, sending, analyzing]);
 
   const handleSend = async () => {
     const trimmed = input.trim();
 
-    if (!trimmed || sending) {
+    if (!trimmed || sending || analyzing) {
       return;
     }
 
@@ -45,11 +46,41 @@ function AiAssistant() {
     }
   };
 
+  const handleAnalyzeProgress = async () => {
+    if (sending || analyzing) {
+      return;
+    }
+
+    setError(null);
+    setAnalyzing(true);
+
+    // Show what the user "asked for" in the chat, for context/continuity
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: "📊 Analyze My Progress" },
+    ]);
+
+    try {
+      const reply = await analyzeProgress();
+      setMessages((prev) => [...prev, reply]);
+    } catch (err: any) {
+      console.error("Progress analysis failed:", err);
+      const backendMessage = err?.response?.data?.message;
+      setError(
+        backendMessage || "Failed to analyze progress. Try again in a moment."
+      );
+    } finally {
+      setAnalyzing(false);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       handleSend();
     }
   };
+
+  const busy = sending || analyzing;
 
   return (
     <div className="min-h-screen bg-gray-900 flex flex-col">
@@ -71,12 +102,22 @@ function AiAssistant() {
             </div>
           </div>
 
-          <Link
-            to="/dashboard"
-            className="text-gray-400 hover:text-white transition text-sm"
-          >
-            Back to Dashboard
-          </Link>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleAnalyzeProgress}
+              disabled={busy}
+              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+            >
+              {analyzing ? "Analyzing..." : "📊 Analyze My Progress"}
+            </button>
+
+            <Link
+              to="/dashboard"
+              className="text-gray-400 hover:text-white transition text-sm"
+            >
+              Back to Dashboard
+            </Link>
+          </div>
 
         </div>
       </nav>
@@ -94,6 +135,9 @@ function AiAssistant() {
               </p>
               <p className="text-sm mt-1">
                 DSA, JavaScript, React, Node.js, MongoDB, and more.
+              </p>
+              <p className="text-sm mt-3 text-gray-600">
+                Or click "Analyze My Progress" above for a personalized review.
               </p>
             </div>
           )}
@@ -117,10 +161,10 @@ function AiAssistant() {
             </div>
           ))}
 
-          {sending && (
+          {busy && (
             <div className="flex justify-start">
               <div className="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 text-gray-400">
-                Thinking...
+                {analyzing ? "Analyzing your progress..." : "Thinking..."}
               </div>
             </div>
           )}
@@ -151,7 +195,7 @@ function AiAssistant() {
 
             <button
               onClick={handleSend}
-              disabled={sending || !input.trim()}
+              disabled={busy || !input.trim()}
               className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-full transition"
             >
               {sending ? "Sending..." : "Send ➤"}
