@@ -3,7 +3,7 @@ import type { Message } from "../types/message";
 
 const API_URL = "http://localhost:5000/api/messages";
 
-export const getMessages = async (): Promise<Message[]> => {
+export const getMessages = async () => {
   const token = localStorage.getItem("token");
 
   const response = await axios.get(API_URL, {
@@ -12,7 +12,7 @@ export const getMessages = async (): Promise<Message[]> => {
     },
   });
 
-  return response.data.messages;
+  return response.data; // { messages, college, message? }
 };
 
 export const sendMessage = async (text: string): Promise<Message> => {

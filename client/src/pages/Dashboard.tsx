@@ -8,6 +8,7 @@ function Dashboard() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [messagesLoading, setMessagesLoading] = useState(true);
   const [messagesError, setMessagesError] = useState<string | null>(null);
+  const [noCollegeNotice, setNoCollegeNotice] = useState<string | null>(null);
 
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
@@ -22,15 +23,25 @@ function Dashboard() {
     });
   }, []);
 
-  // Load this user's previous messages from the DB on mount
-  // (backend already returns them newest first, with sender populated).
+  // Load this user's college-community messages from the DB on mount
+  // (backend already returns them newest first, with sender populated,
+  // scoped to the logged-in user's own college).
   useEffect(() => {
     const loadMessages = async () => {
       try {
         setMessagesLoading(true);
         setMessagesError(null);
+        setNoCollegeNotice(null);
+
         const data = await getMessages();
-        setMessages(data);
+        setMessages(data.messages);
+
+        if (!data.college) {
+          setNoCollegeNotice(
+            data.message ||
+              "Set your college in your profile to join a community chat."
+          );
+        }
       } catch (error) {
         console.error("Failed to load messages:", error);
         setMessagesError("Failed to load messages.");
@@ -58,9 +69,10 @@ function Dashboard() {
       // Newest message goes on top, existing messages stay below untouched
       setMessages((prev) => [savedMessage, ...prev]);
       setNewMessage("");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to send message:", error);
-      setSendError("Failed to send message. Try again.");
+      const backendMessage = error?.response?.data?.message;
+      setSendError(backendMessage || "Failed to send message. Try again.");
     } finally {
       setSending(false);
     }
@@ -120,6 +132,15 @@ function Dashboard() {
       {/* Main Content */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-6 py-8">
 
+        {noCollegeNotice && (
+          <div className="mb-4 rounded-lg border border-yellow-600 bg-yellow-900/30 px-4 py-3 text-sm text-yellow-300">
+            {noCollegeNotice}{" "}
+            <Link to="/edit-profile" className="underline hover:text-yellow-200">
+              Set it now
+            </Link>
+          </div>
+        )}
+
         {/* Messages List — newest first, scrolls independently */}
         <div className="flex flex-col gap-3 max-h-[65vh] overflow-y-auto pr-2">
 
@@ -131,7 +152,7 @@ function Dashboard() {
             <p className="text-red-400 text-sm">{messagesError}</p>
           )}
 
-          {!messagesLoading && !messagesError && messages.length === 0 && (
+          {!messagesLoading && !messagesError && messages.length === 0 && !noCollegeNotice && (
             <p className="text-gray-500 text-sm">No messages yet. Say something!</p>
           )}
 
