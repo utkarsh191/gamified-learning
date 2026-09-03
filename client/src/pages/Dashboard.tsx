@@ -14,18 +14,12 @@ function Dashboard() {
   const [sending, setSending] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
 
-  // NEW — marks today as an active day for the app's own streak.
-  // Fire-and-forget: doesn't block rendering, and the backend is
-  // idempotent, so this being called on every Dashboard mount is safe.
   useEffect(() => {
     pingActivity().catch((error) => {
       console.error("Failed to ping activity:", error);
     });
   }, []);
 
-  // Load this user's college-community messages from the DB on mount
-  // (backend already returns them newest first, with sender populated,
-  // scoped to the logged-in user's own college).
   useEffect(() => {
     const loadMessages = async () => {
       try {
@@ -66,7 +60,6 @@ function Dashboard() {
 
       const savedMessage = await sendMessage(trimmed);
 
-      // Newest message goes on top, existing messages stay below untouched
       setMessages((prev) => [savedMessage, ...prev]);
       setNewMessage("");
     } catch (error: any) {
@@ -109,6 +102,14 @@ function Dashboard() {
                 #12
               </p>
             </div>
+
+            {/* AI Assistant */}
+            <Link
+              to="/ai-assistant"
+              className="text-gray-300 hover:text-white transition text-sm font-semibold flex items-center gap-1"
+            >
+              🤖 AI Assistant
+            </Link>
 
             {/* Profile Circle */}
             <Link
@@ -191,7 +192,6 @@ function Dashboard() {
 
           <div className="flex items-center gap-3">
 
-            {/* Message Input */}
             <input
               type="text"
               value={newMessage}
@@ -201,7 +201,6 @@ function Dashboard() {
               className="flex-1 bg-gray-700 text-white rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            {/* Send Button */}
             <button
               onClick={handleSend}
               disabled={sending || !newMessage.trim()}
