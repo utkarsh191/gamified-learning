@@ -2,6 +2,7 @@ import User from "../models/User.js";
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware.js";
 import { checkGithubUserExists } from "./githubController.js";
+import { checkLeetcodeUserExists } from "./leetcodeController.js";
 
 const PROFILE_FIELDS = [
   "name",
@@ -106,6 +107,32 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       if (!githubExists) {
         return res.status(400).json({
           message: "GitHub username not found. Please check your username.",
+        });
+      }
+    }
+
+    // --- LeetCode validation ---
+    // Same rule: only validate when new/changed, never on an unchanged
+    // stored username.
+    if (
+      newLeetcodeUsername !== undefined &&
+      newLeetcodeUsername.trim() &&
+      newLeetcodeUsername.trim() !== existingUser.leetcodeUsername
+    ) {
+      let leetcodeExists: boolean;
+
+      try {
+        leetcodeExists = await checkLeetcodeUserExists(newLeetcodeUsername.trim());
+      } catch (error) {
+        console.error("LeetCode validation error:", error);
+        return res.status(502).json({
+          message: "Could not verify LeetCode username right now. Please try again.",
+        });
+      }
+
+      if (!leetcodeExists) {
+        return res.status(400).json({
+          message: "LeetCode username not found. Please check your username.",
         });
       }
     }

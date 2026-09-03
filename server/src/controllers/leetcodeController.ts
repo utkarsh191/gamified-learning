@@ -55,6 +55,41 @@ const parseSubmissionCalendar = (raw: string | undefined): DailyCount[] => {
   }
 };
 
+// Lightweight existence check for profile validation — only requests
+// `username`, skips submitStatsGlobal/userCalendar entirely. Does not
+// touch getLeetcodeActivity below.
+export const checkLeetcodeUserExists = async (
+  username: string
+): Promise<boolean> => {
+  const query = `
+    query userExists($username: String!) {
+      matchedUser(username: $username) {
+        username
+      }
+    }
+  `;
+
+  const response = await fetch(LEETCODE_GRAPHQL_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Referer: "https://leetcode.com/",
+    },
+    body: JSON.stringify({ query, variables: { username } }),
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      `LeetCode API error while validating username (status ${response.status})`
+    );
+  }
+
+  const result: { data: { matchedUser: { username: string } | null } } =
+    await response.json();
+
+  return !!result.data?.matchedUser;
+};
+
 export const getLeetcodeActivity = async (
   req: Request<{ username: string }>,
   res: Response
