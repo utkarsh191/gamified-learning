@@ -31,6 +31,31 @@ const XP_CACHE_FIELDS = [
   "leetcodeTotalSolved",
 ] as const;
 
+const LINKEDIN_URL_REGEX =
+  /^https?:\/\/(www\.)?linkedin\.com\/in\/([a-zA-Z0-9-]{3,100})\/?$/;
+const LINKEDIN_USERNAME_REGEX = /^[a-zA-Z0-9-]{3,100}$/;
+
+// Accepts either a full LinkedIn profile URL or a bare username and
+// resolves to just the username, matching how linkedinUsername is
+// already used elsewhere (Profile.tsx builds the link itself).
+const resolveLinkedinUsername = (
+  value: string
+): { valid: boolean; username: string } => {
+  const trimmed = value.trim();
+
+  if (trimmed.includes("linkedin.com")) {
+    const match = trimmed.match(LINKEDIN_URL_REGEX);
+    if (!match) return { valid: false, username: "" };
+    return { valid: true, username: match[2] };
+  }
+
+  if (!LINKEDIN_USERNAME_REGEX.test(trimmed)) {
+    return { valid: false, username: "" };
+  }
+
+  return { valid: true, username: trimmed };
+};
+
 // GET /api/profile -> returns the logged-in user's full profile (includes cached XP)
 export const getProfile = async (req: AuthRequest, res: Response) => {
   try {
@@ -83,6 +108,7 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     const newGithubUsername = update.githubUsername as string | undefined;
     const newLeetcodeUsername = update.leetcodeUsername as string | undefined;
+    const newLinkedinUsername = update.linkedinUsername as string | undefined;
 
     // --- GitHub validation ---
     // Only calls the API when the username is present, non-empty, AND
@@ -135,6 +161,21 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
           message: "LeetCode username not found. Please check your username.",
         });
       }
+    }
+
+    // --- LinkedIn format validation ---
+    if (newLinkedinUsername !== undefined && newLinkedinUsername.trim()) {
+      const resolved = resolveLinkedinUsername(newLinkedinUsername);
+
+      if (!resolved.valid) {
+        return res.status(400).json({
+          message:
+            "Invalid LinkedIn URL. Expected format: https://www.linkedin.com/in/username",
+        });
+      }
+
+      // Normalize storage to just the username either way.
+      update.linkedinUsername = resolved.username;
     }
 
     // "Removed" = this update explicitly sends a blank value AND the user
