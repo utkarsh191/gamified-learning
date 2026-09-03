@@ -10,6 +10,14 @@ import type { DailyActivityEntry } from "../services/activityService";
 interface ActivityHeatmapProps {
   githubUsername?: string;
   leetcodeUsername?: string;
+  // Source of truth for these three comes from the app's own activity
+  // system (User.currentStreak / maxStreak / totalActiveDays via
+  // getActivity()), passed down from Profile.tsx — NOT calculated locally
+  // from GitHub/LeetCode dates. This keeps this section's numbers
+  // identical to the Day Streak card above it.
+  currentStreak: number;
+  maxStreak: number;
+  totalActiveDays: number;
 }
 
 interface DailyCount {
@@ -134,59 +142,6 @@ const getMonthLabelPositions = (weeks: DaySquare[][]): (string | null)[] => {
   return labels;
 };
 
-// Own streak calculation from the merged GitHub+LeetCode daily activity —
-// never reads GitHub's or LeetCode's own streak numbers directly.
-const calculateStreaks = (breakdownMap: Record<string, DayBreakdown>) => {
-  const activeDates = Object.keys(breakdownMap)
-    .filter((date) => totalForDay(breakdownMap[date]) > 0)
-    .sort();
-
-  if (activeDates.length === 0) {
-    return { totalActiveDays: 0, currentStreak: 0, maxStreak: 0 };
-  }
-
-  let maxStreak = 1;
-  let runningStreak = 1;
-
-  for (let i = 1; i < activeDates.length; i++) {
-    const prev = new Date(activeDates[i - 1]);
-    const curr = new Date(activeDates[i]);
-    const diffDays = Math.round(
-      (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
-    );
-
-    runningStreak = diffDays === 1 ? runningStreak + 1 : 1;
-    maxStreak = Math.max(maxStreak, runningStreak);
-  }
-
-  const lastActive = activeDates[activeDates.length - 1];
-  const today = toDateOnly(new Date());
-  const yesterday = toDateOnly(new Date(Date.now() - 24 * 60 * 60 * 1000));
-
-  let currentStreak = 0;
-  if (lastActive === today || lastActive === yesterday) {
-    currentStreak = 1;
-    for (let i = activeDates.length - 1; i > 0; i--) {
-      const prev = new Date(activeDates[i - 1]);
-      const curr = new Date(activeDates[i]);
-      const diffDays = Math.round(
-        (curr.getTime() - prev.getTime()) / (1000 * 60 * 60 * 24)
-      );
-      if (diffDays === 1) {
-        currentStreak++;
-      } else {
-        break;
-      }
-    }
-  }
-
-  return {
-    totalActiveDays: activeDates.length,
-    currentStreak,
-    maxStreak,
-  };
-};
-
 // Converts the cached array (or freshly merged GitHub+LeetCode data) into
 // the {date -> {githubCount, leetcodeCount}} lookup the component renders
 // from.
@@ -240,6 +195,9 @@ const maskByCurrentUsernames = (
 function ActivityHeatmap({
   githubUsername,
   leetcodeUsername,
+  currentStreak,
+  maxStreak,
+  totalActiveDays,
 }: ActivityHeatmapProps) {
   const [breakdownMap, setBreakdownMap] = useState<Record<string, DayBreakdown>>({});
   // loading = true ONLY while we have nothing at all to show yet (no cache,
@@ -362,10 +320,9 @@ function ActivityHeatmap({
     );
   }
 
-  const { totalActiveDays, currentStreak, maxStreak } =
-    calculateStreaks(breakdownMap);
-
-  // Activity Points — display-only score, never added to profile totalXP.
+  // Activity Points — display-only score, derived purely from coding
+  // activity (GitHub commits + LeetCode submissions). Never added to
+  // profile totalXP, and intentionally NOT a streak — left as-is.
   const totalActivityPoints = Object.values(breakdownMap).reduce(
     (sum, b) => sum + totalForDay(b),
     0

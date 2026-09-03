@@ -16,6 +16,8 @@ function Profile() {
   const [refreshingLeetcode, setRefreshingLeetcode] = useState(false);
 
   const [currentStreak, setCurrentStreak] = useState(0);
+  const [maxStreak, setMaxStreak] = useState(0);
+  const [totalActiveDays, setTotalActiveDays] = useState(0);
 
   const totalXP = githubXP + leetcodeXP;
 
@@ -149,12 +151,17 @@ function Profile() {
 
         // App activity / streak — completely separate system, always
         // fetched regardless of GitHub/LeetCode usernames, never reset
-        // by them.
+        // by them. This is the single source of truth for the app's own
+        // streak — both the Day Streak card below AND the Coding Activity
+        // section's "Current Streak" (via props passed to ActivityHeatmap)
+        // are driven from these same three values.
         tasks.push(
           getActivity()
             .then((activityData) => {
               if (!cancelled) {
                 setCurrentStreak(activityData.currentStreak ?? 0);
+                setMaxStreak(activityData.maxStreak ?? 0);
+                setTotalActiveDays(activityData.totalActiveDays ?? 0);
               }
             })
             .catch((error) => {
@@ -394,11 +401,16 @@ function Profile() {
 
         </section>
 
-        {/* Activity Heatmap */}
+        {/* Activity Heatmap — streak numbers passed down from the same
+            app-streak source of truth used by the Day Streak card above,
+            so both never diverge. */}
         <section className="mt-6">
           <ActivityHeatmap
             githubUsername={user.githubUsername}
             leetcodeUsername={user.leetcodeUsername}
+            currentStreak={currentStreak}
+            maxStreak={maxStreak}
+            totalActiveDays={totalActiveDays}
           />
         </section>
 
