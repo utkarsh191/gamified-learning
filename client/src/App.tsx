@@ -5,6 +5,7 @@ import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
+import AiAssistant from "./pages/AiAssistant"; // NEW
 import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
@@ -50,6 +51,15 @@ function App() {
           element={
             <ProtectedRoute>
               <EditProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/ai-assistant"
+          element={
+            <ProtectedRoute>
+              <AiAssistant />
             </ProtectedRoute>
           }
         />
