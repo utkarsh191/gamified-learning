@@ -24,6 +24,7 @@ function EditProfile() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Load existing profile data
   useEffect(() => {
@@ -61,6 +62,7 @@ function EditProfile() {
   const handleSave = async () => {
     try {
       setSaving(true);
+      setErrorMessage(null);
 
       const profileData = {
         name: displayName,
@@ -79,14 +81,22 @@ function EditProfile() {
         learningGoals,
       };
 
-    const data = await updateProfile(profileData);
+      const data = await updateProfile(profileData);
 
       console.log("Profile updated:", data);
 
       // Save successful → Profile page
       navigate("/profile");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to save profile:", error);
+
+      const message =
+        error?.response?.data?.message ||
+        (error?.message === "Network Error"
+          ? "Network error. Please check your connection and try again."
+          : "Failed to save profile. Please try again.");
+
+      setErrorMessage(message);
     } finally {
       setSaving(false);
     }
@@ -458,6 +468,13 @@ function EditProfile() {
 
           </div>
         </section>
+
+        {/* Validation / server error message */}
+        {errorMessage && (
+          <div className="mt-10 rounded-lg border border-red-500 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+            {errorMessage}
+          </div>
+        )}
 
         {/* Save Button */}
         <div className="mt-10 pb-10">
