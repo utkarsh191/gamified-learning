@@ -81,6 +81,35 @@ const githubHeaders = () => ({
   "X-GitHub-Api-Version": "2026-03-10",
 });
 
+// Lightweight existence check for profile validation — confirms the
+// account exists via a single GET, without fetching repos/commits/PRs/
+// issues/reviews. Reuses the same GITHUB_API_BASE/githubHeaders as the
+// full activity handler below; that handler is untouched.
+export const checkGithubUserExists = async (
+  username: string
+): Promise<boolean> => {
+  if (!process.env.GITHUB_TOKEN) {
+    console.error("GITHUB_TOKEN is not set in environment variables");
+    throw new Error("Server misconfiguration: missing GitHub token");
+  }
+
+  const response = await fetch(`${GITHUB_API_BASE}/users/${username}`, {
+    headers: githubHeaders(),
+  });
+
+  if (response.status === 404) {
+    return false;
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      `GitHub API error while validating username (status ${response.status})`
+    );
+  }
+
+  return true;
+};
+
 /**
  * Runs `worker` over `items` with at most `limit` requests in flight at
  * once. This is a small worker pool: each "lane" keeps pulling the next

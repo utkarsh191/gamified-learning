@@ -1,6 +1,7 @@
 import User from "../models/User.js";
 import { Request, Response } from "express";
 import { AuthRequest } from "../middleware/authMiddleware.js";
+import { checkGithubUserExists } from "./githubController.js";
 
 const PROFILE_FIELDS = [
   "name",
@@ -81,6 +82,33 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
 
     const newGithubUsername = update.githubUsername as string | undefined;
     const newLeetcodeUsername = update.leetcodeUsername as string | undefined;
+
+    // --- GitHub validation ---
+    // Only calls the API when the username is present, non-empty, AND
+    // different from what's already stored — no redundant calls on
+    // unchanged usernames.
+    if (
+      newGithubUsername !== undefined &&
+      newGithubUsername.trim() &&
+      newGithubUsername.trim() !== existingUser.githubUsername
+    ) {
+      let githubExists: boolean;
+
+      try {
+        githubExists = await checkGithubUserExists(newGithubUsername.trim());
+      } catch (error) {
+        console.error("GitHub validation error:", error);
+        return res.status(502).json({
+          message: "Could not verify GitHub username right now. Please try again.",
+        });
+      }
+
+      if (!githubExists) {
+        return res.status(400).json({
+          message: "GitHub username not found. Please check your username.",
+        });
+      }
+    }
 
     // "Removed" = this update explicitly sends a blank value AND the user
     // previously had a real value set. A field simply not being sent at
