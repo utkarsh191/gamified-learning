@@ -210,6 +210,17 @@ function Profile() {
     <div className="min-h-screen bg-gray-900 px-6 py-8 text-white">
       <div className="mx-auto max-w-5xl">
 
+        {/* Back to Dashboard — fixes missing navigation path from Profile */}
+        <div className="mb-4">
+          <Link
+            to="/dashboard"
+            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition"
+          >
+            <span aria-hidden="true">←</span>
+            Back to Dashboard
+          </Link>
+        </div>
+
         {/* Profile Header */}
         <section className="rounded-2xl bg-gray-800 p-8 shadow-xl">
           <div className="flex flex-col items-start gap-6 md:flex-row">
