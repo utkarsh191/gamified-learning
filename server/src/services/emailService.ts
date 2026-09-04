@@ -28,3 +28,22 @@ export const sendPasswordResetEmail = async (
     `,
   });
 };
+
+// Sends the signup verification OTP. Same failure-propagation contract as
+// sendPasswordResetEmail — caller decides what to persist based on
+// whether this succeeds.
+export const sendOtpEmail = async (
+  toEmail: string,
+  otp: string
+): Promise<void> => {
+  await transporter.sendMail({
+    from: `"Gamified Learning" <${process.env.GMAIL_USER}>`,
+    to: toEmail,
+    subject: "Your verification code",
+    html: `
+      <p>Your Gamified Learning verification code is:</p>
+      <p style="font-size: 28px; font-weight: bold; letter-spacing: 4px;">${otp}</p>
+      <p>This code is valid for 10 minutes. If you did not request this, you can safely ignore this email.</p>
+    `,
+  });
+};
