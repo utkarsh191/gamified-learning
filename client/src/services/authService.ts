@@ -45,3 +45,36 @@ export const resetPassword = async (token: string, password: string) => {
 
   return response.data;
 };
+
+export const initiateSignup = async (
+  name: string,
+  username: string,
+  email: string,
+  password: string
+) => {
+  const response = await axios.post(`${API_URL}/signup/initiate`, {
+    name,
+    username,
+    email,
+    password,
+  });
+
+  return response.data;
+};
+
+export const verifySignupOtp = async (email: string, otp: string) => {
+  const response = await axios.post(`${API_URL}/signup/verify-otp`, {
+    email,
+    otp,
+  });
+
+  return response.data;
+};
+
+export const resendSignupOtp = async (email: string) => {
+  const response = await axios.post(`${API_URL}/signup/resend-otp`, {
+    email,
+  });
+
+  return response.data;
+};
