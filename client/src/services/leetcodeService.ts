@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/leetcode";
+const API_URL = "import.meta.env.VITE_API_URL/leetcode";
 
 export const getLeetcodeActivity = async (username: string) => {
   const response = await fetch(`${API_URL}/${username}`);
