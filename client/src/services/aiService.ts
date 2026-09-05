@@ -1,7 +1,7 @@
 import axios from "axios";
 import type { ChatMessage } from "../types/ai";
 
-const API_URL = "import.meta.env.VITE_API_URL/ai";
+const API_URL = `${import.meta.env.VITE_API_URL}/ai`;
 
 export const sendChatMessage = async (
   messages: ChatMessage[]

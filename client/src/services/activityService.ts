@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "import.meta.env.VITE_API_URL/activity";
+const API_URL = `${import.meta.env.VITE_API_URL}/activity`;
 
 // Marks today as an active day for the logged-in user (app's own streak,
 // NOT GitHub/LeetCode). Safe to call every time the app loads — the
