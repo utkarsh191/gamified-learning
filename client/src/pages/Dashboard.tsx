@@ -86,7 +86,7 @@ function Dashboard() {
 
           {/* Logo */}
           <div className="text-2xl font-bold text-white">
-            🎮 Gamified Learning
+            Gamified Learning
           </div>
 
           {/* Right Side */}
