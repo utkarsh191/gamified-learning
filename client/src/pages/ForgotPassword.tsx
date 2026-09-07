@@ -34,9 +34,9 @@ function ForgotPassword() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-800 rounded-2xl p-8 shadow-xl">
-        <h1 className="text-3xl font-bold text-white text-center mb-2">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 font-sans antialiased">
+      <div className="w-full max-w-md bg-[#141414] border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/60">
+        <h1 className="text-3xl font-bold text-white text-center mb-2 tracking-tight">
           Forgot Password
         </h1>
 
@@ -45,20 +45,20 @@ function ForgotPassword() {
         </p>
 
         {message && (
-          <div className="mb-5 rounded-lg border border-green-600 bg-green-900/30 px-4 py-3 text-sm text-green-300">
+          <div className="mb-5 rounded-lg border border-emerald-600/40 bg-emerald-900/20 px-4 py-3 text-sm text-emerald-300">
             {message}
           </div>
         )}
 
         {errorMessage && (
-          <div className="mb-5 rounded-lg border border-red-500 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="mb-5 rounded-lg border border-red-600 bg-red-600/10 px-4 py-3 text-sm text-red-400">
             {errorMessage}
           </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-gray-300 mb-2">
+            <label className="block text-gray-300 mb-2 font-medium">
               Email
             </label>
 
@@ -67,7 +67,7 @@ function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your registered email"
-              className="w-full bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-[#181818] border border-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               required
             />
           </div>
@@ -75,7 +75,7 @@ function ForgotPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition"
+            className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-lg transition"
           >
             {loading ? "Sending..." : "Send Reset Link"}
           </button>
@@ -83,7 +83,7 @@ function ForgotPassword() {
 
         <p className="text-gray-400 text-center mt-6">
           Remembered your password?{" "}
-          <Link to="/login" className="text-blue-400 hover:text-blue-300">
+          <Link to="/login" className="text-red-500 hover:text-red-400 font-medium">
             Back to Login
           </Link>
         </p>
