@@ -85,7 +85,7 @@ function Dashboard() {
         <div className="max-w-7xl mx-auto flex items-center justify-between">
 
           {/* Logo */}
-          <div className="text-2xl font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
+          <div className="text-2xl font-bold tracking-tight bg-linear-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">
             Gamified Learning
           </div>
 
@@ -114,14 +114,14 @@ function Dashboard() {
             {/* Profile Circle */}
             <Link
             to="/profile"
-              className="w-11 h-11 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-white font-semibold text-lg hover:from-indigo-400 hover:to-violet-500 transition flex items-center justify-center shadow-md shadow-indigo-900/40"
+              className="w-11 h-11 rounded-full bg-linear-to-br from-indigo-500 to-violet-600 text-white font-semibold text-lg hover:from-indigo-400 hover:to-violet-500 transition flex items-center justify-center shadow-md shadow-indigo-900/40"
             >
                U
             </Link>
 
             {/* Premium */}
             <button
-              className="bg-gradient-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-[#0b0b13] font-semibold px-5 py-2 rounded-lg transition shadow-md shadow-amber-900/30"
+              className="bg-linear-to-r from-amber-400 to-orange-400 hover:from-amber-300 hover:to-orange-300 text-[#0b0b13] font-semibold px-5 py-2 rounded-lg transition shadow-md shadow-amber-900/30"
             >
               Premium
             </button>
@@ -204,7 +204,7 @@ function Dashboard() {
             <button
               onClick={handleSend}
               disabled={sending || !newMessage.trim()}
-              className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-full transition shadow-sm shadow-indigo-900/40"
+              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-full transition shadow-sm shadow-indigo-900/40"
             >
               {sending ? "Sending..." : "Send ➤"}
             </button>

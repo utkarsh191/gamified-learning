@@ -106,7 +106,7 @@ function AiAssistant() {
             <button
               onClick={handleAnalyzeProgress}
               disabled={busy}
-              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm shadow-emerald-900/40"
+              className="bg-linear-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm shadow-emerald-900/40"
             >
               {analyzing ? "Analyzing..." : "📊 Analyze My Progress"}
             </button>
@@ -152,7 +152,7 @@ function AiAssistant() {
               <div
                 className={`max-w-[80%] rounded-2xl px-5 py-3 whitespace-pre-wrap leading-relaxed ${
                   msg.role === "user"
-                    ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                    ? "bg-linear-to-br from-indigo-600 to-violet-600 text-white"
                     : "bg-[#1c1c2b] border border-white/10 text-slate-100"
                 }`}
               >
@@ -196,7 +196,7 @@ function AiAssistant() {
             <button
               onClick={handleSend}
               disabled={busy || !input.trim()}
-              className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-full transition shadow-sm shadow-indigo-900/40"
+              className="bg-linear-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-full transition shadow-sm shadow-indigo-900/40"
             >
               {sending ? "Sending..." : "Send ➤"}
             </button>
