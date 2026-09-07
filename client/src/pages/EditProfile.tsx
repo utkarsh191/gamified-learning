@@ -104,30 +104,30 @@ function EditProfile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-900 p-8 text-white">
+      <div className="min-h-screen bg-black p-8 text-white font-sans">
         Loading profile...
       </div>
     );
   }
   
   return (
-    <div className="min-h-screen bg-gray-900 px-4 py-8 text-white md:px-8">
+    <div className="min-h-screen bg-black px-4 py-8 text-white md:px-8 font-sans antialiased">
       <div className="mx-auto max-w-4xl">
 
         {/* Profile Photo */}
         <section className="mb-10">
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold tracking-tight">
             Profile Photo
           </h2>
 
           <div className="mt-4 flex items-center gap-5">
-            <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-gray-700 text-3xl font-bold">
+            <div className="flex h-24 w-24 items-center justify-center rounded-xl bg-[#181818] border border-white/10 text-3xl font-bold">
               👤
             </div>
 
             <button
               type="button"
-              className="rounded-lg bg-gray-700 px-5 py-2 font-semibold transition hover:bg-gray-600"
+              className="rounded-lg bg-[#2a2a2a] px-5 py-2 font-semibold transition hover:bg-[#3a3a3a]"
             >
               Change Photo
             </button>
@@ -136,7 +136,7 @@ function EditProfile() {
 
         {/* General */}
         <section>
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold tracking-tight">
             General
           </h2>
 
@@ -157,7 +157,7 @@ function EditProfile() {
                 placeholder="Enter your display name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -170,7 +170,7 @@ function EditProfile() {
               <select
                 value={college}
                 onChange={(e) => setCollege(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none focus:ring-2 focus:ring-red-600"
               >
                 <option value="">
                   Select your college
@@ -198,7 +198,7 @@ function EditProfile() {
                 placeholder="Enter your location"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -213,7 +213,7 @@ function EditProfile() {
                 placeholder="Enter your GitHub username"
                 value={githubUsername}
                 onChange={(e) => setGithubUsername(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -228,7 +228,7 @@ function EditProfile() {
                 placeholder="Enter your LinkedIn username"
                 value={linkedinUsername}
                 onChange={(e) => setLinkedinUsername(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -243,7 +243,7 @@ function EditProfile() {
                 placeholder="Enter your LeetCode username"
                 value={leetcodeUsername}
                 onChange={(e) => setLeetcodeUsername(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -258,7 +258,7 @@ function EditProfile() {
                 placeholder="Enter your X username"
                 value={xUsername}
                 onChange={(e) => setXUsername(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -273,7 +273,7 @@ function EditProfile() {
                 placeholder="Write something about yourself..."
                 value={readMe}
                 onChange={(e) => setReadMe(e.target.value)}
-                className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full resize-none rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -282,7 +282,7 @@ function EditProfile() {
 
         {/* Experience */}
         <section className="mt-10">
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold tracking-tight">
             Experience
           </h2>
 
@@ -303,7 +303,7 @@ function EditProfile() {
                 placeholder="Write about your work experience..."
                 value={workExperience}
                 onChange={(e) => setWorkExperience(e.target.value)}
-                className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full resize-none rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -318,7 +318,7 @@ function EditProfile() {
                 placeholder="Enter your education"
                 value={education}
                 onChange={(e) => setEducation(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -333,7 +333,7 @@ function EditProfile() {
                 placeholder="Enter your skills separated by commas"
                 value={skills}
                 onChange={(e) => setSkills(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -342,7 +342,7 @@ function EditProfile() {
 
         {/* Learning */}
         <section className="mt-10">
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold tracking-tight">
             Learning
           </h2>
 
@@ -363,7 +363,7 @@ function EditProfile() {
                 placeholder="What are you currently learning?"
                 value={currentLearning}
                 onChange={(e) => setCurrentLearning(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -378,7 +378,7 @@ function EditProfile() {
                 placeholder="Enter your interests"
                 value={interests}
                 onChange={(e) => setInterests(e.target.value)}
-                className="w-full rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -393,7 +393,7 @@ function EditProfile() {
                 placeholder="Enter your learning goals"
                 value={learningGoals}
                 onChange={(e) => setLearningGoals(e.target.value)}
-                className="w-full resize-none rounded-lg border border-gray-700 bg-gray-800 px-4 py-3 text-white outline-none transition focus:border-blue-500"
+                className="w-full resize-none rounded-lg border border-white/10 bg-[#181818] px-4 py-3 text-white outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               />
             </div>
 
@@ -402,7 +402,7 @@ function EditProfile() {
 
         {/* Curate Your Profile */}
         <section className="mt-10">
-          <h2 className="text-xl font-bold">
+          <h2 className="text-xl font-bold tracking-tight">
             Curate your profile
           </h2>
 
@@ -413,7 +413,7 @@ function EditProfile() {
           <div className="mt-5 space-y-4">
 
             {/* Coding Activity */}
-            <div className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-800 px-5 py-4">
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-[#181818] px-5 py-4 hover:border-red-600/40 transition">
               <div>
                 <p className="font-semibold">
                   Coding Activity
@@ -426,12 +426,12 @@ function EditProfile() {
 
               <input
                 type="checkbox"
-                className="h-5 w-5"
+                className="h-5 w-5 accent-red-600"
               />
             </div>
 
             {/* Achievements */}
-            <div className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-800 px-5 py-4">
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-[#181818] px-5 py-4 hover:border-red-600/40 transition">
               <div>
                 <p className="font-semibold">
                   Achievements
@@ -444,12 +444,12 @@ function EditProfile() {
 
               <input
                 type="checkbox"
-                className="h-5 w-5"
+                className="h-5 w-5 accent-red-600"
               />
             </div>
 
             {/* Learning Progress */}
-            <div className="flex items-center justify-between rounded-xl border border-gray-700 bg-gray-800 px-5 py-4">
+            <div className="flex items-center justify-between rounded-xl border border-white/10 bg-[#181818] px-5 py-4 hover:border-red-600/40 transition">
               <div>
                 <p className="font-semibold">
                   Learning Progress
@@ -462,7 +462,7 @@ function EditProfile() {
 
               <input
                 type="checkbox"
-                className="h-5 w-5"
+                className="h-5 w-5 accent-red-600"
               />
             </div>
 
@@ -471,7 +471,7 @@ function EditProfile() {
 
         {/* Validation / server error message */}
         {errorMessage && (
-          <div className="mt-10 rounded-lg border border-red-500 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          <div className="mt-10 rounded-lg border border-red-600 bg-red-600/10 px-4 py-3 text-sm text-red-400">
             {errorMessage}
           </div>
         )}
@@ -482,7 +482,7 @@ function EditProfile() {
             type="button"
             onClick={handleSave}
             disabled={saving}
-            className="rounded-lg bg-blue-600 px-8 py-3 font-semibold transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-red-600 px-8 py-3 font-semibold transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
