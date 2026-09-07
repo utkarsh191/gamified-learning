@@ -21,9 +21,9 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-gray-800 rounded-2xl p-8 shadow-xl">
-        <h1 className="text-3xl font-bold text-white text-center mb-2">
+    <div className="min-h-screen bg-black flex items-center justify-center px-4 font-sans antialiased">
+      <div className="w-full max-w-md bg-[#141414] border border-white/10 rounded-2xl p-8 shadow-2xl shadow-black/60">
+        <h1 className="text-3xl font-bold text-white text-center mb-2 tracking-tight">
           Welcome Back
         </h1>
 
@@ -33,7 +33,7 @@ function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div>
-            <label className="block text-gray-300 mb-2">
+            <label className="block text-gray-300 mb-2 font-medium">
               Email
             </label>
 
@@ -42,13 +42,13 @@ function Login() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Enter your email"
-              className="w-full bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-[#181818] border border-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               required
             />
           </div>
 
           <div>
-            <label className="block text-gray-300 mb-2">
+            <label className="block text-gray-300 mb-2 font-medium">
               Password
             </label>
 
@@ -57,14 +57,14 @@ function Login() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full bg-gray-700 text-white rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-[#181818] border border-white/10 text-white placeholder-gray-500 rounded-lg px-4 py-3 outline-none transition focus:border-red-600 focus:ring-1 focus:ring-red-600"
               required
             />
 
             <div className="text-right mt-2">
               <Link
                 to="/forgot-password"
-                className="text-sm text-blue-400 hover:text-blue-300"
+                className="text-sm text-red-500 hover:text-red-400"
               >
                 Forgot Password?
               </Link>
@@ -73,7 +73,7 @@ function Login() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition"
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold py-3 rounded-lg transition"
           >
             Login
           </button>
@@ -83,7 +83,7 @@ function Login() {
           Don't have an account?{" "}
           <Link
            to="/signup"
-           className="text-blue-400 cursor-pointer  hover:text-blue-300">
+           className="text-red-500 cursor-pointer font-medium hover:text-red-400">
             Sign up
           </Link>
         </p>
