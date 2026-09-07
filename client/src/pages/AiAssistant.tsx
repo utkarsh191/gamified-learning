@@ -83,21 +83,21 @@ function AiAssistant() {
   const busy = sending || analyzing;
 
   return (
-    <div className="min-h-screen bg-gray-900 flex flex-col">
+    <div className="min-h-screen bg-[#0f0f17] flex flex-col font-sans antialiased">
 
       {/* Navbar */}
-      <nav className="w-full bg-gray-800 border-b border-gray-700 px-6 py-4">
+      <nav className="w-full bg-[#161622] border-b border-white/10 px-6 py-4 shadow-md shadow-black/20">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
 
           <div className="flex items-center gap-4">
             <Link
               to="/dashboard"
-              className="text-gray-400 hover:text-white transition"
+              className="text-slate-400 hover:text-white transition"
             >
               ←
             </Link>
 
-            <div className="text-2xl font-bold text-white">
+            <div className="text-2xl font-semibold tracking-tight text-white">
               🤖 AI Assistant
             </div>
           </div>
@@ -106,14 +106,14 @@ function AiAssistant() {
             <button
               onClick={handleAnalyzeProgress}
               disabled={busy}
-              className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-4 py-2 rounded-lg transition"
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm shadow-emerald-900/40"
             >
               {analyzing ? "Analyzing..." : "📊 Analyze My Progress"}
             </button>
 
             <Link
               to="/dashboard"
-              className="text-gray-400 hover:text-white transition text-sm"
+              className="text-slate-400 hover:text-white transition text-sm"
             >
               Back to Dashboard
             </Link>
@@ -128,15 +128,15 @@ function AiAssistant() {
         <div className="flex-1 overflow-y-auto flex flex-col gap-4 pr-2">
 
           {messages.length === 0 && (
-            <div className="flex-1 flex flex-col items-center justify-center text-center text-gray-500">
+            <div className="flex-1 flex flex-col items-center justify-center text-center text-slate-500">
               <p className="text-4xl mb-3">🤖</p>
-              <p className="font-semibold text-gray-300">
+              <p className="font-medium text-slate-300">
                 Ask me anything about coding
               </p>
-              <p className="text-sm mt-1">
+              <p className="text-sm mt-1 text-slate-500">
                 DSA, JavaScript, React, Node.js, MongoDB, and more.
               </p>
-              <p className="text-sm mt-3 text-gray-600">
+              <p className="text-sm mt-3 text-slate-600">
                 Or click "Analyze My Progress" above for a personalized review.
               </p>
             </div>
@@ -150,10 +150,10 @@ function AiAssistant() {
               }`}
             >
               <div
-                className={`max-w-[80%] rounded-2xl px-5 py-3 whitespace-pre-wrap ${
+                className={`max-w-[80%] rounded-2xl px-5 py-3 whitespace-pre-wrap leading-relaxed ${
                   msg.role === "user"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-800 border border-gray-700 text-white"
+                    ? "bg-gradient-to-br from-indigo-600 to-violet-600 text-white"
+                    : "bg-[#1c1c2b] border border-white/10 text-slate-100"
                 }`}
               >
                 {msg.content}
@@ -163,7 +163,7 @@ function AiAssistant() {
 
           {busy && (
             <div className="flex justify-start">
-              <div className="bg-gray-800 border border-gray-700 rounded-2xl px-5 py-3 text-gray-400">
+              <div className="bg-[#1c1c2b] border border-white/10 rounded-2xl px-5 py-3 text-slate-400">
                 {analyzing ? "Analyzing your progress..." : "Thinking..."}
               </div>
             </div>
@@ -175,11 +175,11 @@ function AiAssistant() {
       </main>
 
       {/* Message Bar */}
-      <div className="w-full border-t border-gray-700 bg-gray-800 px-6 py-4">
+      <div className="w-full border-t border-white/10 bg-[#161622] px-6 py-4">
         <div className="max-w-4xl mx-auto">
 
           {error && (
-            <p className="text-red-400 text-sm mb-2">{error}</p>
+            <p className="text-rose-400 text-sm mb-2">{error}</p>
           )}
 
           <div className="flex items-center gap-3">
@@ -190,13 +190,13 @@ function AiAssistant() {
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask a question..."
-              className="flex-1 bg-gray-700 text-white rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 bg-[#1f1f2e] text-white placeholder-slate-500 rounded-full px-5 py-3 outline-none focus:ring-2 focus:ring-indigo-500 transition"
             />
 
             <button
               onClick={handleSend}
               disabled={busy || !input.trim()}
-              className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-full transition"
+              className="bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium px-6 py-3 rounded-full transition shadow-sm shadow-indigo-900/40"
             >
               {sending ? "Sending..." : "Send ➤"}
             </button>
