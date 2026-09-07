@@ -200,21 +200,21 @@ function Profile() {
 
   if (!user) {
     return (
-      <div className="text-white p-8">
+      <div className="text-white p-8 bg-black min-h-screen font-sans">
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 px-6 py-8 text-white">
+    <div className="min-h-screen bg-black px-6 py-8 text-white font-sans antialiased">
       <div className="mx-auto max-w-5xl">
 
         {/* Back to Dashboard — fixes missing navigation path from Profile */}
         <div className="mb-4">
           <Link
             to="/dashboard"
-            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition"
+            className="inline-flex items-center gap-2 text-red-500 hover:text-red-400 transition"
           >
             <span aria-hidden="true">←</span>
             Back to Dashboard
@@ -222,23 +222,23 @@ function Profile() {
         </div>
 
         {/* Profile Header */}
-        <section className="rounded-2xl bg-gray-800 p-8 shadow-xl">
+        <section className="rounded-2xl bg-[#141414] border border-white/10 p-8 shadow-2xl shadow-black/60">
           <div className="flex flex-col items-start gap-6 md:flex-row">
 
             {/* Profile Avatar */}
-            <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-gray-700 text-4xl font-bold">
+            <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-[#181818] border border-white/10 text-4xl font-bold">
               {user.name?.charAt(0).toUpperCase()}
             </div>
 
             <div className="flex-1">
 
               {/* Name */}
-              <h1 className="text-3xl font-bold">
+              <h1 className="text-3xl font-bold tracking-tight">
                 {user.name}
               </h1>
 
               {/* Username */}
-              <p className="mt-1 text-blue-400">
+              <p className="mt-1 text-red-500">
                 @{user.username}
               </p>
 
@@ -250,7 +250,7 @@ function Profile() {
               ) : (
                 <Link
                   to="/edit-profile"
-                  className="mt-4 block text-blue-400 hover:text-blue-300"
+                  className="mt-4 block text-red-500 hover:text-red-400"
                 >
                   ✏️ Add something about yourself
                 </Link>
@@ -264,7 +264,7 @@ function Profile() {
               ) : (
                 <Link
                   to="/edit-profile"
-                  className="mt-4 block text-blue-400 hover:text-blue-300"
+                  className="mt-4 block text-red-500 hover:text-red-400"
                 >
                   🎓 Add your college
                 </Link>
@@ -287,7 +287,7 @@ function Profile() {
                     href={`https://github.com/${user.githubUsername}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 hover:underline"
+                    className="text-red-500 hover:text-red-400 hover:underline"
                   >
                     GitHub: {user.githubUsername}
                   </a>
@@ -299,7 +299,7 @@ function Profile() {
                     href={`https://www.linkedin.com/in/${user.linkedinUsername}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 hover:underline"
+                    className="text-red-500 hover:text-red-400 hover:underline"
                   >
                     LinkedIn: {user.linkedinUsername}
                   </a>
@@ -311,7 +311,7 @@ function Profile() {
                     href={`https://leetcode.com/u/${user.leetcodeUsername}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 hover:underline"
+                    className="text-red-500 hover:text-red-400 hover:underline"
                   >
                     LeetCode: {user.leetcodeUsername}
                   </a>
@@ -323,7 +323,7 @@ function Profile() {
                     href={`https://x.com/${user.xUsername}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 hover:underline"
+                    className="text-red-500 hover:text-red-400 hover:underline"
                   >
                     X: {user.xUsername}
                   </a>
@@ -335,7 +335,7 @@ function Profile() {
             {/* Edit Profile */}
             <Link
               to="/edit-profile"
-              className="rounded-lg bg-green-600 px-6 py-3 font-semibold transition hover:bg-green-700"
+              className="rounded-lg bg-red-600 px-6 py-3 font-semibold transition hover:bg-red-700"
             >
               Edit Profile
             </Link>
@@ -346,7 +346,7 @@ function Profile() {
         <section className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
 
           {/* Global Rank */}
-          <div className="rounded-xl bg-gray-800 p-5 text-center">
+          <div className="rounded-xl bg-[#141414] border border-white/10 p-5 text-center hover:border-red-600/40 transition">
             <p className="text-2xl">🏆</p>
 
             <p className="mt-2 text-2xl font-bold">
@@ -359,7 +359,7 @@ function Profile() {
           </div>
 
           {/* Total XP */}
-          <div className="rounded-xl bg-gray-800 p-5 text-center">
+          <div className="rounded-xl bg-[#141414] border border-white/10 p-5 text-center hover:border-red-600/40 transition">
             <p className="text-2xl">⭐</p>
 
             <p className="mt-2 text-2xl font-bold">
@@ -379,7 +379,7 @@ function Profile() {
 
           {/* Current Streak — app's own activity system, intentionally
               separate from GitHub/LeetCode reset */}
-          <div className="rounded-xl bg-gray-800 p-5 text-center">
+          <div className="rounded-xl bg-[#141414] border border-white/10 p-5 text-center hover:border-red-600/40 transition">
             <p className="text-2xl">🔥</p>
 
             <p className="mt-2 text-2xl font-bold">
@@ -392,7 +392,7 @@ function Profile() {
           </div>
 
           {/* Problems Solved */}
-          <div className="rounded-xl bg-gray-800 p-5 text-center">
+          <div className="rounded-xl bg-[#141414] border border-white/10 p-5 text-center hover:border-red-600/40 transition">
             <p className="text-2xl">🎯</p>
 
             <p className="mt-2 text-2xl font-bold">
